@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import {
-  Heart, MapPin, Clock3, Send, Volume2, VolumeX, ChevronDown,
-  CalendarDays, Navigation, Music2
+  Heart, MapPin, Clock3, Volume2, VolumeX, ChevronDown,
+  CalendarDays, Navigation, Music2, Sparkles
 } from "lucide-react";
 import "./styles.css";
 
@@ -29,10 +29,15 @@ const events = [
   ["1 December 2026", "9:00 PM", "Shubh Vivah", "शुभ विवाह", images.wedding, "Welcome Resort, Alwar, Rajasthan"],
 ];
 
-function Countdown() {
+function Countdown({ className = "" }) {
   const [now, setNow] = useState(Date.now());
+  const [tick, setTick] = useState(false);
   useEffect(() => {
-    const id = setInterval(() => setNow(Date.now()), 1000);
+    const id = setInterval(() => {
+      setNow(Date.now());
+      setTick(true);
+      setTimeout(() => setTick(false), 420);
+    }, 1000);
     return () => clearInterval(id);
   }, []);
   const d = Math.max(0, WEDDING - now);
@@ -42,14 +47,23 @@ function Countdown() {
     [Math.floor(d / 60000) % 60, "Minutes"],
     [Math.floor(d / 1000) % 60, "Seconds"],
   ];
-  return <div className="countdown">{vals.map(([v, l]) => <div className="count-cell" key={l}><b>{String(v).padStart(2, "0")}</b><span>{l}</span></div>)}</div>;
+  return (
+    <div className={`countdown ${tick ? "is-ticking" : ""} ${className}`}>
+      {vals.map(([v, l]) => (
+        <div className="count-cell" key={l}>
+          <b>{String(v).padStart(2, "0")}</b>
+          <span>{l}</span>
+        </div>
+      ))}
+    </div>
+  );
 }
 
 function Petals() {
   return <div className="petals" aria-hidden="true">{Array.from({ length: 24 }).map((_, i) => <span key={i} style={{ left: `${(i * 4.7) % 105}%`, animationDelay: `${-(i * .83)}s`, animationDuration: `${7 + (i % 5) * 1.3}s` }}>{i % 4 === 0 ? "✿" : i % 3 === 0 ? "❀" : "✦"}</span>)}</div>;
 }
 
-function RevealSection({ children, className = "", id }) {
+function RevealSection({ children, className = "", id, variant = "" }) {
   const ref = useRef(null);
   useEffect(() => {
     const el = ref.current;
@@ -57,7 +71,57 @@ function RevealSection({ children, className = "", id }) {
     if (el) ob.observe(el);
     return () => ob.disconnect();
   }, []);
-  return <section ref={ref} id={id} className={`section reveal ${className}`}>{children}</section>;
+  return <section ref={ref} id={id} className={`section reveal ${variant} ${className}`}>{children}</section>;
+}
+
+function EventCard({ event, index, featured }) {
+  const ref = useRef(null);
+  const [date, time, title, hindi, img, place] = event;
+  useEffect(() => {
+    const el = ref.current;
+    const ob = new IntersectionObserver(([entry]) => { if (entry.isIntersecting) el.classList.add("is-visible"); }, { threshold: .18 });
+    if (el) ob.observe(el);
+    return () => ob.disconnect();
+  }, []);
+  return (
+    <article
+      ref={ref}
+      className={`event-card reveal-card ${featured ? "featured" : ""} ${index % 2 === 0 ? "from-left" : "from-right"}`}
+      style={{ transitionDelay: `${index * 0.12}s` }}
+    >
+      <div className="event-image">
+        <img src={img} alt={title} className="event-art-img" />
+        <div className="event-shine" aria-hidden="true" />
+        <div className="event-number">0{index + 1}</div>
+      </div>
+      <div className="event-copy">
+        <small>{date}</small>
+        <h3>{title}</h3>
+        <span className="hindi">{hindi}</span>
+        <p><Clock3 size={14} />{time}</p>
+        <p><MapPin size={14} />{place}</p>
+      </div>
+    </article>
+  );
+}
+
+function HeroSparkles() {
+  return (
+    <div className="hero-sparkles" aria-hidden="true">
+      {Array.from({ length: 12 }).map((_, i) => (
+        <Sparkles
+          key={i}
+          size={10 + (i % 3) * 4}
+          style={{
+            left: `${8 + (i * 7.8) % 84}%`,
+            top: `${12 + (i * 11) % 72}%`,
+            animationDelay: `${i * 0.35}s`,
+            animationDuration: `${2.8 + (i % 4) * 0.6}s`,
+          }}
+        />
+      ))}
+    </div>
+  );
 }
 
 function ParallaxImage({ src, alt, className = "", speed = .12 }) {
@@ -117,30 +181,42 @@ function Envelope({ onOpen }) {
 
 function Hero() {
   const [offset, setOffset] = useState(0);
+  const [ready, setReady] = useState(false);
+  useEffect(() => {
+    const t = requestAnimationFrame(() => setReady(true));
+    return () => cancelAnimationFrame(t);
+  }, []);
   useEffect(() => {
     const on = () => setOffset(Math.min(window.scrollY * .16, 120));
     window.addEventListener("scroll", on, { passive: true });
     return () => window.removeEventListener("scroll", on);
   }, []);
-  return <section className="hero">
-    <div className="hero-image" style={{ transform: `translate3d(0,${offset}px,0) scale(1.08)` }} />
-    <div className="hero-overlay" /><Petals />
-    <div className="hero-content">
-      <span className="royal-kicker">ROYAL RAJASTHAN · ALWAR</span><div className="hero-crown">✦ ❧ ✦</div>
-      <div className="script">Together Forever</div><h1>Rajendra <em>♥</em> Monika</h1>
-      <p>Two families. Two hearts. One beautiful beginning.</p>
-      <div className="hero-date"><CalendarDays size={15}/> 01 DECEMBER 2026 <b>·</b> 9:00 PM</div>
-      <div className="hero-venue">Welcome Resort · Alwar, Rajasthan</div><Countdown />
-      <a className="discover" href="#story"><span>SCROLL TO DISCOVER</span><ChevronDown /></a>
-    </div>
-  </section>;
+  return (
+    <section className={`hero ${ready ? "hero-ready" : ""}`}>
+      <div className="hero-image" style={{ transform: `translate3d(0,${offset}px,0) scale(1.08)` }} />
+      <div className="hero-overlay" />
+      <Petals />
+      <HeroSparkles />
+      <div className="hero-content">
+        <span className="royal-kicker">ROYAL RAJASTHAN · ALWAR</span>
+        <div className="hero-crown">✦ ❧ ✦</div>
+        <div className="script">Together Forever</div>
+        <h1>Rajendra <em className="pulse-heart">♥</em> Monika</h1>
+        <p>Two families. Two hearts. One beautiful beginning.</p>
+        <div className="hero-date"><CalendarDays size={15} /> 01 DECEMBER 2026 <b>·</b> 9:00 PM</div>
+        <div className="hero-venue">Welcome Resort · Alwar, Rajasthan</div>
+        <Countdown />
+        <a className="discover" href="#story"><span>SCROLL TO DISCOVER</span><ChevronDown /></a>
+      </div>
+    </section>
+  );
 }
 
 function App() {
   const [entered, setEntered] = useState(false), [hi, setHi] = useState(false);
-  const [rsvp, setRsvp] = useState({ name: "", guests: "2", msg: "" });
-  const T = hi ? { story: "हमारी कहानी", events: "शुभ अवसर", family: "हमारे परिवार", venue: "स्थान", rsvp: "आपका आशीर्वाद" } : { story: "Our Story", events: "Wedding Celebrations", family: "With the Blessings of Our Families", venue: "The Venue", rsvp: "Your Blessings" };
-  const submit = e => { e.preventDefault(); window.open("https://wa.me/?text=" + encodeURIComponent(`Rajendra & Monika Wedding RSVP\nName: ${rsvp.name}\nGuests: ${rsvp.guests}\nMessage: ${rsvp.msg}`), "_blank"); };
+  const T = hi
+    ? { story: "हमारी कहानी", events: "शुभ अवसर", family: "हमारे परिवार", venue: "स्थान" }
+    : { story: "Our Story", events: "Wedding Celebrations", family: "With the Blessings of Our Families", venue: "The Venue" };
   if (!entered) return <Envelope onOpen={() => setEntered(true)} />;
 
   return <div className="app">
@@ -160,10 +236,9 @@ function App() {
       </RevealSection>
 
       <RevealSection className="events"><small>04 · {T.events}</small><h2>Moments worth <em>celebrating.</em></h2>
-        <div className="event-list">{events.map((e, i) => <article className={`event-card ${i === 3 ? "featured" : ""}`} key={e[2]}>
-          <div className="event-image"><img src={e[4]} alt={e[2]} className="event-art-img"/><div className="event-number">0{i + 1}</div></div>
-          <div className="event-copy"><small>{e[0]}</small><h3>{e[2]}</h3><span className="hindi">{e[3]}</span><p><Clock3 size={14}/>{e[1]}</p><p><MapPin size={14}/>{e[5]}</p></div>
-        </article>)}</div>
+        <div className="event-list">
+          {events.map((e, i) => <EventCard key={e[2]} event={e} index={i} featured={i === 3} />)}
+        </div>
       </RevealSection>
 
       <RevealSection className="center"><small>05 · {T.family}</small><h2>With love from <em>our families.</em></h2>
@@ -174,11 +249,13 @@ function App() {
         <div className="venue"><div className="venue-art"><img src={images.wedding} alt="Wedding venue celebration"/><div><Navigation size={22}/> ALWAR · RAJASTHAN</div></div><div className="venue-copy"><h3>Welcome Resort</h3><p>200 Ft Rd, Dayanand Nagar,<br/>Sakti Nagar, Alwar, Rajasthan 301001</p><a className="gold" href={maps} target="_blank" rel="noreferrer"><Navigation size={15}/> OPEN GOOGLE MAPS</a></div></div>
       </RevealSection>
 
-      <RevealSection className="center"><small>07 · RSVP</small><h2>{T.rsvp}</h2><p className="lead">Your presence and blessings would make our celebration complete.</p>
-        <form onSubmit={submit}><input required placeholder="Your name" value={rsvp.name} onChange={e => setRsvp({ ...rsvp, name: e.target.value })}/><select value={rsvp.guests} onChange={e => setRsvp({ ...rsvp, guests: e.target.value })}><option value="1">1 guest</option><option value="2">2 guests</option><option value="3">3 guests</option><option value="4">4 guests</option><option value="5">5 guests</option></select><textarea rows="4" placeholder="Message / blessings" value={rsvp.msg} onChange={e => setRsvp({ ...rsvp, msg: e.target.value })}/><button className="gold"><Send size={15}/> SEND RSVP ON WHATSAPP</button></form>
+      <RevealSection className="closing reveal-closing" variant="center">
+        <div className="ornament float-ornament">✦ ❧ ✦</div>
+        <h2>Until forever begins.</h2>
+        <p>Your presence and blessings are the most precious gift.</p>
+        <strong className="closing-monogram">R <i className="pulse-heart">♥</i> M</strong>
+        <small>1 · 12 · 2026</small>
       </RevealSection>
-
-      <section className="closing"><div className="ornament">✦ ❧ ✦</div><h2>Until forever begins.</h2><p>Your presence and blessings are the most precious gift.</p><strong>R <i>♥</i> M</strong><small>1 · 12 · 2026</small></section>
     </main><footer>Rajendra ♥ Monika · Alwar, Rajasthan</footer>
   </div>;
 }
