@@ -47,7 +47,7 @@ header{position:fixed;z-index:50;top:0;left:50%;transform:translateX(-50%);width
 @keyframes headerIn{from{opacity:0;transform:translateX(-50%) translateY(-12px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
 footer{background:#24060b;color:#cdbb98;text-align:center;padding:18px;font-size:10px;letter-spacing:1px}
 .lightbox{position:fixed;z-index:100;inset:0;background:#120206ed;display:flex;align-items:center;justify-content:center;padding:35px;animation:fadeIn .25s}.lightbox img{max-width:92%;max-height:86%;object-fit:contain;box-shadow:0 20px 70px #0008}.lightbox span{position:absolute;bottom:22px;color:var(--g2);font-size:9px;letter-spacing:2px}.close-lightbox{position:absolute;right:22px;top:18px;border:0;background:#ffffff16;color:#fff;border-radius:50%;padding:10px}@keyframes fadeIn{from{opacity:0}to{opacity:1}}
-@media(max-width:650px){.hero{min-height:820px}.hero h1{font-size:58px}.section{padding:75px 20px}.section h2{font-size:45px}.dark h2{font-size:51px}.event-list{grid-template-columns:1fr}.event-card.featured{grid-column:span 1}.families{grid-template-columns:1fr}.venue{grid-template-columns:1fr}.venue-art{min-height:230px}.gallery-grid{gap:7px}.gallery-item{min-height:175px}.envelope-scene{height:310px}.envelope{inset:35px 0 0}.count-cell b{font-size:34px}}
+@media(max-width:650px){.hero{min-height:820px}.hero h1{font-size:58px}.section{padding:75px 20px}.section h2{font-size:45px}.dark h2{font-size:51px}.event-list{grid-template-columns:1fr}.event-card.featured{grid-column:span 1}.families{grid-template-columns:1fr}.venue{grid-template-columns:1fr}.venue-art{min-height:230px}.gallery-grid{gap:7px}.gallery-item{min-height:175px}.envelope-scene{height:310px}.envelope{inset:35px 0 0}.count-cell b{font-size:34px}.scratch-line1{font-size:30px}.scratch-card--large .scratch-inner{min-height:178px}}
 
 /* Premium interaction layer */
 .parallax-wrap{position:relative;width:100%;height:100%;overflow:hidden;isolation:isolate}
@@ -77,7 +77,69 @@ footer{background:#24060b;color:#cdbb98;text-align:center;padding:18px;font-size
   .palace-badge{font-size:7px;left:10px;bottom:10px;padding:8px 10px}
   .gallery-intro{font-size:17px}
 }
-@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.petals{display:none}.reveal{transition:none}.reveal-card{transition:none;opacity:1;transform:none!important}.parallax-wrap img{transform:none!important}.discover svg{animation:none}.hero-ready .hero-content>*{animation:none}.hero-sparkles{display:none}.pulse-heart,.open-invite,.float-ornament{animation:none}.countdown.is-ticking .count-cell b{animation:none}}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}.petals{display:none}.reveal{transition:none}.reveal-card{transition:none;opacity:1;transform:none!important}.parallax-wrap img{transform:none!important}.discover svg{animation:none}.hero-ready .hero-content>*{animation:none}.hero-sparkles{display:none}.pulse-heart,.open-invite,.float-ornament{animation:none}.countdown.is-ticking .count-cell b{animation:none}.gold-dust,.scratch-shimmer,.premium-glow-ring::before{animation:none!important}.scratch-sparkle-ring i{animation:none}}
+
+/* Scratch-to-reveal date cards */
+.scratch-card{position:relative;margin:26px auto 0;max-width:100%}
+.scratch-card--large{max-width:min(520px,100%)}
+.scratch-inner{position:relative;overflow:hidden;border-radius:14px;min-height:196px;background:linear-gradient(145deg,#fff9ef,#f6e8c8 42%,#fff6e4);box-shadow:inset 0 0 0 1px #f3d58d66,0 22px 50px #00000035}
+.scratch-card--compact .scratch-inner{min-height:96px;border-radius:10px}
+.scratch-card--compact .scratch-line1{font-size:22px}
+.scratch-card--compact .scratch-line2{font-size:11px;margin-top:4px}
+.scratch-reveal-content{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;min-height:inherit;padding:28px 20px}
+.scratch-card--compact .scratch-reveal-content{padding:16px 14px}
+.scratch-kicker{font-size:9px;letter-spacing:3px;text-transform:uppercase;color:#8d2735;margin-bottom:8px}
+.scratch-card--large .scratch-kicker,.save-date-premium .scratch-kicker{color:var(--g2)}
+.scratch-line1{font:600 38px/1 "Cormorant Garamond";color:var(--m);letter-spacing:.5px}
+.save-date-premium .scratch-line1{color:#fff5dc;text-shadow:0 2px 18px #00000040}
+.scratch-line2{display:block;font:500 16px "Cormorant Garamond";color:#8b5a2b;margin-top:8px;font-style:normal}
+.save-date-premium .scratch-line2{color:#f0dca8}
+.scratch-canvas{position:absolute;inset:0;z-index:3;width:100%;height:100%;touch-action:none;cursor:crosshair}
+.scratch-corner{position:absolute;width:22px;height:22px;border:2px solid #d9ad5588;z-index:4;pointer-events:none}
+.scratch-corner.tl{top:10px;left:10px;border-right:0;border-bottom:0}
+.scratch-corner.tr{top:10px;right:10px;border-left:0;border-bottom:0}
+.scratch-corner.bl{bottom:10px;left:10px;border-right:0;border-top:0}
+.scratch-corner.br{bottom:10px;right:10px;border-left:0;border-top:0}
+.scratch-shimmer{position:absolute;inset:-2px;border-radius:16px;background:linear-gradient(110deg,transparent 30%,#ffffff55 50%,transparent 70%);background-size:220% 100%;animation:scratchShimmer 3.8s linear infinite;pointer-events:none;z-index:5;opacity:.55}
+.scratch-card.is-revealed .scratch-shimmer{opacity:0}
+@keyframes scratchShimmer{0%{background-position:120% 0}100%{background-position:-120% 0}}
+.scratch-card.is-revealed .scratch-inner{animation:revealPop .75s cubic-bezier(.2,.9,.2,1);box-shadow:inset 0 0 0 1px #f3d58d,0 0 0 1px #d9ad5566,0 26px 60px #d9ad5528}
+@keyframes revealPop{0%{transform:scale(.98)}55%{transform:scale(1.02)}100%{transform:scale(1)}}
+.scratch-sparkle-ring{position:absolute;inset:0;pointer-events:none}
+.scratch-sparkle-ring i{position:absolute;font-style:normal;color:var(--g2);font-size:12px;animation:sparkleBurst 1.4s ease both}
+.scratch-sparkle-ring i:nth-child(1){left:8%;top:18%;animation-delay:.05s}
+.scratch-sparkle-ring i:nth-child(2){right:10%;top:22%;animation-delay:.15s}
+.scratch-sparkle-ring i:nth-child(3){left:50%;top:6%;animation-delay:.25s}
+.scratch-sparkle-ring i:nth-child(4){left:14%;bottom:16%;animation-delay:.12s}
+.scratch-sparkle-ring i:nth-child(5){right:12%;bottom:14%;animation-delay:.2s}
+@keyframes sparkleBurst{0%{opacity:0;transform:scale(.4)}40%{opacity:1;transform:scale(1.2)}100%{opacity:.85;transform:scale(1)}}
+.scratch-skip{position:absolute;right:0;bottom:-30px;border:0;background:transparent;color:inherit;font-size:9px;letter-spacing:1.5px;text-transform:uppercase;opacity:.65;padding:4px 0}
+.scratch-skip:hover{opacity:1}
+.save-date-premium{position:relative;overflow:hidden}
+.save-date-premium .scratch-skip{color:#f0dca8}
+.save-date-hint{font:18px "Cormorant Garamond";color:#ead9b8;max-width:420px;margin:0 auto 6px;opacity:.92}
+.save-date-premium .scratch-inner{background:linear-gradient(145deg,#4a0c14,#6e1522 45%,#3a0910);box-shadow:inset 0 0 0 1px #d9ad5566,0 28px 60px #00000045}
+.gold-dust{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.gold-dust span{position:absolute;width:4px;height:4px;border-radius:50%;background:radial-gradient(circle,#fff6d4,#d9ad5500);animation:goldDrift 7s ease-in-out infinite}
+@keyframes goldDrift{0%,100%{transform:translateY(0) scale(1);opacity:.35}50%{transform:translateY(-22px) scale(1.35);opacity:.9}}
+.countdown-premium{margin-top:36px}
+.countdown-premium .count-cell{backdrop-filter:blur(6px);background:#ffffff08}
+.premium-glow-ring{position:relative}
+.premium-glow-ring::before{content:"";position:absolute;inset:-3px;border-radius:22px;background:conic-gradient(from 0deg,#d9ad55,#fff6d4,#8b2635,#f3d58d,#d9ad55);animation:ringRotate 8s linear infinite;z-index:0;opacity:.75}
+.premium-glow-ring>*{position:relative;z-index:1}
+@keyframes ringRotate{to{transform:rotate(360deg)}}
+.invite-card .envelope-scratch{margin:12px 0 0;width:100%}
+.invite-card .envelope-scratch .scratch-inner{min-height:78px;background:linear-gradient(145deg,#fffaf0,#f3e4c4)}
+.invite-card .envelope-scratch .scratch-line1{font-size:19px;color:var(--m)}
+.invite-card .envelope-scratch .scratch-line2{font-size:9px;color:#8b5a2b}
+.invite-card .envelope-scratch .scratch-skip{bottom:-22px;font-size:7px;color:#8b5a2b;right:50%;transform:translateX(50%)}
+.event-scratch{margin:0 0 10px}
+.event-scratch .scratch-kicker{color:#a22b3a;font-size:8px}
+.event-scratch .scratch-inner{min-height:88px}
+.event-card.featured .event-scratch .scratch-kicker{color:var(--g2)}
+.event-card.featured .event-scratch .scratch-inner{background:linear-gradient(145deg,#5a1020,#7a1a2c)}
+.event-card.featured .event-scratch .scratch-line1{color:#fff3d6}
+.event-card.featured .event-scratch .scratch-line2{color:#ead9b8}
 
 
 /* Image-orientation and sharpness fixes */

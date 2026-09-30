@@ -22,6 +22,9 @@ const images = {
   storyboard: "/images/wedding-storyboard.jpg",
 };
 
+const SCRATCH_REVEAL_RATIO = 0.48;
+const SCRATCH_BRUSH = { large: 40, compact: 26 };
+
 const events = [
   ["29 November 2026", "8:00 PM", "Lagan", "लग्न", images.lagan, "Residence, VPO – Bhatpura, Bharatpur, Rajasthan"],
   ["30 November 2026", "4:00 PM", "Haldi & Mehendi", "हल्दी एवं मेहंदी", images.haldi, "Residence, VPO – Bhatpura, Bharatpur, Rajasthan"],
@@ -63,6 +66,202 @@ function Petals() {
   return <div className="petals" aria-hidden="true">{Array.from({ length: 24 }).map((_, i) => <span key={i} style={{ left: `${(i * 4.7) % 105}%`, animationDelay: `${-(i * .83)}s`, animationDuration: `${7 + (i % 5) * 1.3}s` }}>{i % 4 === 0 ? "✿" : i % 3 === 0 ? "❀" : "✦"}</span>)}</div>;
 }
 
+function GoldDust() {
+  return (
+    <div className="gold-dust" aria-hidden="true">
+      {Array.from({ length: 18 }).map((_, i) => (
+        <span key={i} style={{ left: `${(i * 11.3) % 100}%`, top: `${(i * 17) % 100}%`, animationDelay: `${i * 0.4}s` }} />
+      ))}
+    </div>
+  );
+}
+
+function ScratchReveal({ size = "large", title, line1, line2, hint = "Scratch to reveal", className = "" }) {
+  const wrapRef = useRef(null);
+  const canvasRef = useRef(null);
+  const coatReady = useRef(false);
+  const drawing = useRef(false);
+  const revealedRef = useRef(false);
+  const moveCount = useRef(0);
+  const [revealed, setRevealed] = useState(false);
+  const [reduced, setReduced] = useState(false);
+
+  const paintCoat = (ctx, w, h) => {
+    const g = ctx.createLinearGradient(0, 0, w, h);
+    g.addColorStop(0, "#9a7228");
+    g.addColorStop(0.25, "#f2e0a0");
+    g.addColorStop(0.5, "#fff9e8");
+    g.addColorStop(0.72, "#e8c96a");
+    g.addColorStop(1, "#7a5a18");
+    ctx.fillStyle = g;
+    ctx.fillRect(0, 0, w, h);
+    for (let i = 0; i < 120; i++) {
+      ctx.fillStyle = `rgba(255,255,255,${0.04 + Math.random() * 0.14})`;
+      const s = 1 + Math.random() * 2.5;
+      ctx.fillRect(Math.random() * w, Math.random() * h, s, s * (0.6 + Math.random()));
+    }
+    ctx.strokeStyle = "rgba(255,255,255,0.22)";
+    ctx.lineWidth = 1;
+    for (let i = 0; i < 6; i++) {
+      ctx.beginPath();
+      ctx.moveTo(0, (h / 6) * i);
+      ctx.lineTo(w, (h / 6) * i + 20);
+      ctx.stroke();
+    }
+    ctx.fillStyle = "rgba(55,28,8,0.42)";
+    ctx.font = '600 11px Inter, sans-serif';
+    ctx.textAlign = "center";
+    ctx.fillText(hint.toUpperCase(), w / 2, h / 2 - 5);
+    ctx.font = '500 9px Inter, sans-serif';
+    ctx.fillStyle = "rgba(55,28,8,0.3)";
+    ctx.fillText("✦ swipe to unveil ✦", w / 2, h / 2 + 14);
+  };
+
+  const setupCanvas = () => {
+    const wrap = wrapRef.current;
+    const canvas = canvasRef.current;
+    if (!wrap || !canvas || revealedRef.current) return;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const w = Math.max(1, Math.floor(wrap.clientWidth));
+    const h = Math.max(1, Math.floor(wrap.clientHeight));
+    canvas.width = w * dpr;
+    canvas.height = h * dpr;
+    canvas.style.width = `${w}px`;
+    canvas.style.height = `${h}px`;
+    const ctx = canvas.getContext("2d");
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    paintCoat(ctx, w, h);
+    coatReady.current = true;
+  };
+
+  useEffect(() => {
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    setReduced(mq.matches);
+    const onChange = () => setReduced(mq.matches);
+    mq.addEventListener("change", onChange);
+    return () => mq.removeEventListener("change", onChange);
+  }, []);
+
+  useEffect(() => {
+    if (reduced || revealed) return;
+    setupCanvas();
+    const ro = new ResizeObserver(() => setupCanvas());
+    if (wrapRef.current) ro.observe(wrapRef.current);
+    return () => ro.disconnect();
+  }, [reduced, revealed]);
+
+  const scratchAt = (clientX, clientY) => {
+    const canvas = canvasRef.current;
+    if (!canvas || !coatReady.current || revealedRef.current) return;
+    const rect = canvas.getBoundingClientRect();
+    const x = clientX - rect.left;
+    const y = clientY - rect.top;
+    const ctx = canvas.getContext("2d");
+    const brush = SCRATCH_BRUSH[size] || SCRATCH_BRUSH.large;
+    ctx.globalCompositeOperation = "destination-out";
+    ctx.beginPath();
+    ctx.arc(x, y, brush, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.globalCompositeOperation = "source-over";
+  };
+
+  const checkProgress = () => {
+    const canvas = canvasRef.current;
+    if (!canvas || revealedRef.current) return;
+    const ctx = canvas.getContext("2d");
+    const { width, height } = canvas;
+    if (!width || !height) return;
+    const data = ctx.getImageData(0, 0, width, height).data;
+    let clear = 0;
+    let total = 0;
+    const step = 28;
+    for (let y = 0; y < height; y += step) {
+      for (let x = 0; x < width; x += step) {
+        const i = (y * width + x) * 4 + 3;
+        if (data[i] < 80) clear++;
+        total++;
+      }
+    }
+    if (clear / total >= SCRATCH_REVEAL_RATIO) {
+      revealedRef.current = true;
+      setRevealed(true);
+    }
+  };
+
+  const onRevealNow = () => {
+    revealedRef.current = true;
+    setRevealed(true);
+  };
+
+  const onPointerDown = (e) => {
+    if (revealedRef.current) return;
+    drawing.current = true;
+    canvasRef.current?.setPointerCapture(e.pointerId);
+    scratchAt(e.clientX, e.clientY);
+  };
+  const onPointerMove = (e) => {
+    if (!drawing.current || revealedRef.current) return;
+    scratchAt(e.clientX, e.clientY);
+    moveCount.current += 1;
+    if (moveCount.current % 12 === 0) checkProgress();
+  };
+  const onPointerUp = () => {
+    if (!drawing.current) return;
+    drawing.current = false;
+    checkProgress();
+  };
+
+  const content = (
+    <div className="scratch-reveal-content">
+      {title && <span className="scratch-kicker">{title}</span>}
+      <strong className="scratch-line1">{line1}</strong>
+      {line2 && <em className="scratch-line2">{line2}</em>}
+      {revealed && (
+        <span className="scratch-sparkle-ring" aria-hidden="true">
+          {["✦", "✧", "❋", "✦", "✧"].map((s, i) => <i key={i}>{s}</i>)}
+        </span>
+      )}
+    </div>
+  );
+
+  if (reduced) {
+    return (
+      <div className={`scratch-card scratch-card--${size} is-revealed ${className}`}>
+        {content}
+      </div>
+    );
+  }
+
+  return (
+    <div className={`scratch-card scratch-card--${size} ${revealed ? "is-revealed" : ""} ${className}`}>
+      <span className="scratch-corner tl" aria-hidden="true" />
+      <span className="scratch-corner tr" aria-hidden="true" />
+      <span className="scratch-corner bl" aria-hidden="true" />
+      <span className="scratch-corner br" aria-hidden="true" />
+      <div className="scratch-shimmer" aria-hidden="true" />
+      <div ref={wrapRef} className="scratch-inner">
+        {content}
+        {!revealed && (
+          <canvas
+            ref={canvasRef}
+            className="scratch-canvas"
+            aria-label={`${hint}: ${line1}`}
+            onPointerDown={onPointerDown}
+            onPointerMove={onPointerMove}
+            onPointerUp={onPointerUp}
+            onPointerCancel={onPointerUp}
+          />
+        )}
+      </div>
+      {!revealed && (
+        <button type="button" className="scratch-skip" onClick={onRevealNow}>
+          Reveal date
+        </button>
+      )}
+    </div>
+  );
+}
+
 function RevealSection({ children, className = "", id, variant = "" }) {
   const ref = useRef(null);
   useEffect(() => {
@@ -95,10 +294,21 @@ function EventCard({ event, index, featured }) {
         <div className="event-number">0{index + 1}</div>
       </div>
       <div className="event-copy">
-        <small>{date}</small>
+        {index === 0 ? (
+          <ScratchReveal
+            size="compact"
+            className="event-scratch"
+            title="First date"
+            line1={date}
+            line2={`${title} · ${time}`}
+            hint="Scratch first date"
+          />
+        ) : (
+          <small>{date}</small>
+        )}
         <h3>{title}</h3>
         <span className="hindi">{hindi}</span>
-        <p><Clock3 size={14} />{time}</p>
+        {index !== 0 && <p><Clock3 size={14} />{time}</p>}
         <p><MapPin size={14} />{place}</p>
       </div>
     </article>
@@ -170,7 +380,18 @@ function Envelope({ onOpen }) {
       <div className="envelope-shadow" />
       <div className="envelope">
         <div className="envelope-back"><img src={images.palace} alt="Royal Rajasthani palace wedding illustration" /></div>
-        <div className="invite-card"><div className="mini-ornament">❧ ✦ ❧</div><strong>Rajendra</strong><i>♥</i><strong>Monika</strong><small>1 DECEMBER 2026 · ALWAR</small></div>
+        <div className="invite-card">
+          <div className="mini-ornament">❧ ✦ ❧</div>
+          <strong>Rajendra</strong><i>♥</i><strong>Monika</strong>
+          <ScratchReveal
+            size="compact"
+            className="envelope-scratch"
+            title="Save the date"
+            line1="1 December 2026"
+            line2="Alwar · 9:00 PM"
+            hint="Scratch the date"
+          />
+        </div>
         <div className="envelope-flap"><div className="wax">R ♥ M</div></div>
       </div>
     </div>
@@ -228,10 +449,23 @@ function App() {
         <div className="story-frame portrait-frame"><div className="portrait-backdrop"/><img className="portrait-art" src={images.hero} alt="Rajendra and Monika illustrated portrait"/><div className="frame-caption">Two Families · Two Hearts · One Journey</div></div>
       </RevealSection>
 
-      <RevealSection className="dark center"><small>02 · SAVE THE DATE</small><h2>Until we say <em>“I do.”</em></h2><div className="bigdate">1 December 2026 · 9:00 PM</div><Countdown /></RevealSection>
+      <RevealSection className="dark center save-date-premium">
+        <GoldDust />
+        <small>02 · SAVE THE DATE</small>
+        <h2>Until we say <em>“I do.”</em></h2>
+        <p className="save-date-hint">Unveil our wedding day with a royal scratch card</p>
+        <ScratchReveal
+          size="large"
+          className="save-scratch"
+          title="Shubh Vivah"
+          line1="1 December 2026"
+          line2="9:00 PM · Welcome Resort, Alwar"
+        />
+        <Countdown className="countdown-premium" />
+      </RevealSection>
 
       <RevealSection className="palace center"><small>03 · ROYAL SETTING</small><h2>A celebration in the heart of <em>Rajasthan.</em></h2>
-        <div className="palace-art premium-palace"><div className="palace-backdrop"/><img className="palace-art-img" src={images.palace} alt="Rajasthani palace and wedding mandap illustration"/><div className="palace-glow"/><div className="palace-badge">RAJASTHAN · ROYAL MANDAP</div></div>
+        <div className="palace-art premium-palace premium-glow-ring"><div className="palace-backdrop"/><img className="palace-art-img" src={images.palace} alt="Rajasthani palace and wedding mandap illustration"/><div className="palace-glow"/><div className="palace-badge">RAJASTHAN · ROYAL MANDAP</div></div>
         <p className="lead center-text">Marigolds, lanterns, palace arches and a royal mandap — the visual language of our celebration.</p>
       </RevealSection>
 
