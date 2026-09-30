@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import {
   Heart, MapPin, Clock3, Volume2, VolumeX, ChevronDown,
-  Navigation, Music2, Sparkles
+  CalendarDays, Navigation, Music2, Sparkles
 } from "lucide-react";
 import "./styles.css";
 
@@ -21,9 +21,6 @@ const images = {
   bidaai: "/images/bidaai.jpg",
   storyboard: "/images/wedding-storyboard.jpg",
 };
-
-const SCRATCH_REVEAL_RATIO = 0.48;
-const SCRATCH_BRUSH = { large: 40, compact: 26 };
 
 const events = [
   ["29 November 2026", "8:00 PM", "Lagan", "लग्न", images.lagan, "Residence, VPO – Bhatpura, Bharatpur, Rajasthan"],
@@ -66,188 +63,12 @@ function Petals() {
   return <div className="petals" aria-hidden="true">{Array.from({ length: 24 }).map((_, i) => <span key={i} style={{ left: `${(i * 4.7) % 105}%`, animationDelay: `${-(i * .83)}s`, animationDuration: `${7 + (i % 5) * 1.3}s` }}>{i % 4 === 0 ? "✿" : i % 3 === 0 ? "❀" : "✦"}</span>)}</div>;
 }
 
-function ScratchReveal({ size = "large", title, line1, line2, hint = "Scratch to reveal", className = "" }) {
-  const wrapRef = useRef(null);
-  const canvasRef = useRef(null);
-  const coatReady = useRef(false);
-  const drawing = useRef(false);
-  const revealedRef = useRef(false);
-  const moveCount = useRef(0);
-  const [revealed, setRevealed] = useState(false);
-  const [reduced, setReduced] = useState(false);
-
-  const paintCoat = (ctx, w, h) => {
-    const g = ctx.createLinearGradient(0, 0, w, h);
-    g.addColorStop(0, "#9a7228");
-    g.addColorStop(0.25, "#f2e0a0");
-    g.addColorStop(0.5, "#fff9e8");
-    g.addColorStop(0.72, "#e8c96a");
-    g.addColorStop(1, "#7a5a18");
-    ctx.fillStyle = g;
-    ctx.fillRect(0, 0, w, h);
-    for (let i = 0; i < 120; i++) {
-      ctx.fillStyle = `rgba(255,255,255,${0.04 + Math.random() * 0.14})`;
-      const s = 1 + Math.random() * 2.5;
-      ctx.fillRect(Math.random() * w, Math.random() * h, s, s * (0.6 + Math.random()));
-    }
-    ctx.strokeStyle = "rgba(255,255,255,0.22)";
-    ctx.lineWidth = 1;
-    for (let i = 0; i < 6; i++) {
-      ctx.beginPath();
-      ctx.moveTo(0, (h / 6) * i);
-      ctx.lineTo(w, (h / 6) * i + 20);
-      ctx.stroke();
-    }
-    ctx.fillStyle = "rgba(55,28,8,0.42)";
-    ctx.font = '600 11px Inter, sans-serif';
-    ctx.textAlign = "center";
-    ctx.fillText(hint.toUpperCase(), w / 2, h / 2 - 5);
-    ctx.font = '500 9px Inter, sans-serif';
-    ctx.fillStyle = "rgba(55,28,8,0.3)";
-    ctx.fillText("✦ swipe to unveil ✦", w / 2, h / 2 + 14);
-  };
-
-  const setupCanvas = () => {
-    const wrap = wrapRef.current;
-    const canvas = canvasRef.current;
-    if (!wrap || !canvas || revealedRef.current) return;
-    const dpr = Math.min(window.devicePixelRatio || 1, 2);
-    const w = Math.max(1, Math.floor(wrap.clientWidth));
-    const h = Math.max(1, Math.floor(wrap.clientHeight));
-    canvas.width = w * dpr;
-    canvas.height = h * dpr;
-    canvas.style.width = `${w}px`;
-    canvas.style.height = `${h}px`;
-    const ctx = canvas.getContext("2d");
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    paintCoat(ctx, w, h);
-    coatReady.current = true;
-  };
-
-  useEffect(() => {
-    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
-    setReduced(mq.matches);
-    const onChange = () => setReduced(mq.matches);
-    mq.addEventListener("change", onChange);
-    return () => mq.removeEventListener("change", onChange);
-  }, []);
-
-  useEffect(() => {
-    if (reduced || revealed) return;
-    setupCanvas();
-    const ro = new ResizeObserver(() => setupCanvas());
-    if (wrapRef.current) ro.observe(wrapRef.current);
-    return () => ro.disconnect();
-  }, [reduced, revealed]);
-
-  const scratchAt = (clientX, clientY) => {
-    const canvas = canvasRef.current;
-    if (!canvas || !coatReady.current || revealedRef.current) return;
-    const rect = canvas.getBoundingClientRect();
-    const x = clientX - rect.left;
-    const y = clientY - rect.top;
-    const ctx = canvas.getContext("2d");
-    const brush = SCRATCH_BRUSH[size] || SCRATCH_BRUSH.large;
-    ctx.globalCompositeOperation = "destination-out";
-    ctx.beginPath();
-    ctx.arc(x, y, brush, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.globalCompositeOperation = "source-over";
-  };
-
-  const checkProgress = () => {
-    const canvas = canvasRef.current;
-    if (!canvas || revealedRef.current) return;
-    const ctx = canvas.getContext("2d");
-    const { width, height } = canvas;
-    if (!width || !height) return;
-    const data = ctx.getImageData(0, 0, width, height).data;
-    let clear = 0;
-    let total = 0;
-    const step = 28;
-    for (let y = 0; y < height; y += step) {
-      for (let x = 0; x < width; x += step) {
-        const i = (y * width + x) * 4 + 3;
-        if (data[i] < 80) clear++;
-        total++;
-      }
-    }
-    if (clear / total >= SCRATCH_REVEAL_RATIO) {
-      revealedRef.current = true;
-      setRevealed(true);
-    }
-  };
-
-  const onRevealNow = () => {
-    revealedRef.current = true;
-    setRevealed(true);
-  };
-
-  const onPointerDown = (e) => {
-    if (revealedRef.current) return;
-    drawing.current = true;
-    canvasRef.current?.setPointerCapture(e.pointerId);
-    scratchAt(e.clientX, e.clientY);
-  };
-  const onPointerMove = (e) => {
-    if (!drawing.current || revealedRef.current) return;
-    scratchAt(e.clientX, e.clientY);
-    moveCount.current += 1;
-    if (moveCount.current % 12 === 0) checkProgress();
-  };
-  const onPointerUp = () => {
-    if (!drawing.current) return;
-    drawing.current = false;
-    checkProgress();
-  };
-
-  const content = (
-    <div className="scratch-reveal-content">
-      {title && <span className="scratch-kicker">{title}</span>}
-      <strong className="scratch-line1">{line1}</strong>
-      {line2 && <em className="scratch-line2">{line2}</em>}
-      {revealed && (
-        <span className="scratch-sparkle-ring" aria-hidden="true">
-          {["✦", "✧", "❋", "✦", "✧"].map((s, i) => <i key={i}>{s}</i>)}
-        </span>
-      )}
-    </div>
-  );
-
-  if (reduced) {
-    return (
-      <div className={`scratch-card scratch-card--${size} is-revealed ${className}`}>
-        {content}
-      </div>
-    );
-  }
-
+function AmbientOrbs() {
   return (
-    <div className={`scratch-card scratch-card--${size} ${revealed ? "is-revealed" : ""} ${className}`}>
-      <span className="scratch-corner tl" aria-hidden="true" />
-      <span className="scratch-corner tr" aria-hidden="true" />
-      <span className="scratch-corner bl" aria-hidden="true" />
-      <span className="scratch-corner br" aria-hidden="true" />
-      <div className="scratch-shimmer" aria-hidden="true" />
-      <div ref={wrapRef} className="scratch-inner">
-        {content}
-        {!revealed && (
-          <canvas
-            ref={canvasRef}
-            className="scratch-canvas"
-            aria-label={`${hint}: ${line1}`}
-            onPointerDown={onPointerDown}
-            onPointerMove={onPointerMove}
-            onPointerUp={onPointerUp}
-            onPointerCancel={onPointerUp}
-          />
-        )}
-      </div>
-      {!revealed && (
-        <button type="button" className="scratch-skip" onClick={onRevealNow}>
-          Reveal date
-        </button>
-      )}
+    <div className="ambient-orbs" aria-hidden="true">
+      <span className="orb orb-a" />
+      <span className="orb orb-b" />
+      <span className="orb orb-c" />
     </div>
   );
 }
@@ -297,7 +118,7 @@ function EventCard({ event, index, featured }) {
 function HeroSparkles() {
   return (
     <div className="hero-sparkles" aria-hidden="true">
-      {Array.from({ length: 12 }).map((_, i) => (
+      {Array.from({ length: 18 }).map((_, i) => (
         <Sparkles
           key={i}
           size={10 + (i % 3) * 4}
@@ -360,7 +181,7 @@ function Envelope({ onOpen }) {
       <div className="envelope">
         <div className="envelope-back"><img src={images.palace} alt="Royal Rajasthani palace wedding illustration" /></div>
         <div className="invite-card"><div className="mini-ornament">❧ ✦ ❧</div><strong>Rajendra</strong><i>♥</i><strong>Monika</strong><small>1 DECEMBER 2026 · ALWAR</small></div>
-        <div className="envelope-flap"><div className="wax">R ♥ M</div></div>
+        <div className="envelope-flap"><div className="wax wax-glow">R ♥ M</div></div>
       </div>
     </div>
     <button className="open-invite" onClick={open}><Heart size={16}/> TAP TO OPEN</button>
@@ -384,23 +205,23 @@ function Hero() {
     <section className={`hero ${ready ? "hero-ready" : ""}`}>
       <div className="hero-image" style={{ transform: `translate3d(0,${offset}px,0) scale(1.08)` }} />
       <div className="hero-overlay" />
+      <div className="hero-rays" aria-hidden="true" />
+      <AmbientOrbs />
       <Petals />
       <HeroSparkles />
       <div className="hero-content">
         <span className="royal-kicker">ROYAL RAJASTHAN · ALWAR</span>
         <div className="hero-crown">✦ ❧ ✦</div>
-        <div className="script">Together Forever</div>
+        <div className="script script-shimmer">Together Forever</div>
         <h1>Rajendra <em className="pulse-heart">♥</em> Monika</h1>
         <p>Two families. Two hearts. One beautiful beginning.</p>
-        <ScratchReveal
-          size="compact"
-          className="hero-scratch"
-          line1="01 DECEMBER 2026"
-          line2="9:00 PM"
-          hint="Scratch to reveal date"
-        />
+        <div className="hero-date premium-date">
+          <span className="hero-date-glow" aria-hidden="true" />
+          <CalendarDays size={15} />
+          01 DECEMBER 2026 <b>·</b> 9:00 PM
+        </div>
         <div className="hero-venue">Welcome Resort · Alwar, Rajasthan</div>
-        <Countdown />
+        <Countdown className="countdown-hero" />
         <a className="discover" href="#story"><span>SCROLL TO DISCOVER</span><ChevronDown /></a>
       </div>
     </section>
@@ -409,24 +230,39 @@ function Hero() {
 
 function App() {
   const [entered, setEntered] = useState(false), [hi, setHi] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const T = hi
     ? { story: "हमारी कहानी", events: "शुभ अवसर", family: "हमारे परिवार", venue: "स्थान" }
     : { story: "Our Story", events: "Wedding Celebrations", family: "With the Blessings of Our Families", venue: "The Venue" };
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 48);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
   if (!entered) return <Envelope onOpen={() => setEntered(true)} />;
 
   return <div className="app">
-    <header><div className="brand">R <i>♥</i> M</div><nav><button onClick={() => setHi(!hi)}>{hi ? "EN" : "हिंदी"}</button><MusicButton /></nav></header>
+    <header className={scrolled ? "is-scrolled" : ""}><div className="brand brand-glow">R <i>♥</i> M</div><nav><button onClick={() => setHi(!hi)}>{hi ? "EN" : "हिंदी"}</button><MusicButton /></nav></header>
     <Hero />
     <main>
       <RevealSection id="story" className="story"><small>01 · {T.story}</small><h2>Two souls, <em>one beautiful beginning.</em></h2>
         <p className="lead">Two families met, conversations turned into warmth, and a beautiful new beginning took shape. We invite you to be part of this chapter as we begin our life together with your love and blessings.</p>
-        <div className="story-frame portrait-frame"><div className="portrait-backdrop"/><img className="portrait-art" src={images.hero} alt="Rajendra and Monika illustrated portrait"/><div className="frame-caption">Two Families · Two Hearts · One Journey</div></div>
+        <div className="story-frame portrait-frame portrait-ring"><div className="portrait-backdrop"/><img className="portrait-art" src={images.hero} alt="Rajendra and Monika illustrated portrait"/><div className="frame-caption">Two Families · Two Hearts · One Journey</div></div>
       </RevealSection>
 
-      <RevealSection className="dark center"><small>02 · SAVE THE DATE</small><h2>Until we say <em>“I do.”</em></h2><div className="bigdate">1 December 2026 · 9:00 PM</div><Countdown /></RevealSection>
+      <RevealSection className="dark center save-date-luxe">
+        <AmbientOrbs />
+        <small>02 · SAVE THE DATE</small>
+        <h2>Until we say <em>“I do.”</em></h2>
+        <div className="bigdate bigdate-shine">1 December 2026 · 9:00 PM</div>
+        <Countdown className="countdown-luxe" />
+      </RevealSection>
 
       <RevealSection className="palace center"><small>03 · ROYAL SETTING</small><h2>A celebration in the heart of <em>Rajasthan.</em></h2>
-        <div className="palace-art premium-palace"><div className="palace-backdrop"/><img className="palace-art-img" src={images.palace} alt="Rajasthani palace and wedding mandap illustration"/><div className="palace-glow"/><div className="palace-badge">RAJASTHAN · ROYAL MANDAP</div></div>
+        <div className="palace-art premium-palace palace-ring"><div className="palace-backdrop"/><img className="palace-art-img" src={images.palace} alt="Rajasthani palace and wedding mandap illustration"/><div className="palace-glow"/><div className="palace-badge">RAJASTHAN · ROYAL MANDAP</div></div>
         <p className="lead center-text">Marigolds, lanterns, palace arches and a royal mandap — the visual language of our celebration.</p>
       </RevealSection>
 
