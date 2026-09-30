@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import {
   Heart, MapPin, Clock3, Volume2, VolumeX, ChevronDown,
-  CalendarDays, Navigation, Music2, Sparkles
+  Navigation, Music2, Sparkles
 } from "lucide-react";
 import "./styles.css";
 
@@ -64,16 +64,6 @@ function Countdown({ className = "" }) {
 
 function Petals() {
   return <div className="petals" aria-hidden="true">{Array.from({ length: 24 }).map((_, i) => <span key={i} style={{ left: `${(i * 4.7) % 105}%`, animationDelay: `${-(i * .83)}s`, animationDuration: `${7 + (i % 5) * 1.3}s` }}>{i % 4 === 0 ? "✿" : i % 3 === 0 ? "❀" : "✦"}</span>)}</div>;
-}
-
-function GoldDust() {
-  return (
-    <div className="gold-dust" aria-hidden="true">
-      {Array.from({ length: 18 }).map((_, i) => (
-        <span key={i} style={{ left: `${(i * 11.3) % 100}%`, top: `${(i * 17) % 100}%`, animationDelay: `${i * 0.4}s` }} />
-      ))}
-    </div>
-  );
 }
 
 function ScratchReveal({ size = "large", title, line1, line2, hint = "Scratch to reveal", className = "" }) {
@@ -294,21 +284,10 @@ function EventCard({ event, index, featured }) {
         <div className="event-number">0{index + 1}</div>
       </div>
       <div className="event-copy">
-        {index === 0 ? (
-          <ScratchReveal
-            size="compact"
-            className="event-scratch"
-            title="First date"
-            line1={date}
-            line2={`${title} · ${time}`}
-            hint="Scratch first date"
-          />
-        ) : (
-          <small>{date}</small>
-        )}
+        <small>{date}</small>
         <h3>{title}</h3>
         <span className="hindi">{hindi}</span>
-        {index !== 0 && <p><Clock3 size={14} />{time}</p>}
+        <p><Clock3 size={14} />{time}</p>
         <p><MapPin size={14} />{place}</p>
       </div>
     </article>
@@ -380,18 +359,7 @@ function Envelope({ onOpen }) {
       <div className="envelope-shadow" />
       <div className="envelope">
         <div className="envelope-back"><img src={images.palace} alt="Royal Rajasthani palace wedding illustration" /></div>
-        <div className="invite-card">
-          <div className="mini-ornament">❧ ✦ ❧</div>
-          <strong>Rajendra</strong><i>♥</i><strong>Monika</strong>
-          <ScratchReveal
-            size="compact"
-            className="envelope-scratch"
-            title="Save the date"
-            line1="1 December 2026"
-            line2="Alwar · 9:00 PM"
-            hint="Scratch the date"
-          />
-        </div>
+        <div className="invite-card"><div className="mini-ornament">❧ ✦ ❧</div><strong>Rajendra</strong><i>♥</i><strong>Monika</strong><small>1 DECEMBER 2026 · ALWAR</small></div>
         <div className="envelope-flap"><div className="wax">R ♥ M</div></div>
       </div>
     </div>
@@ -424,7 +392,13 @@ function Hero() {
         <div className="script">Together Forever</div>
         <h1>Rajendra <em className="pulse-heart">♥</em> Monika</h1>
         <p>Two families. Two hearts. One beautiful beginning.</p>
-        <div className="hero-date"><CalendarDays size={15} /> 01 DECEMBER 2026 <b>·</b> 9:00 PM</div>
+        <ScratchReveal
+          size="compact"
+          className="hero-scratch"
+          line1="01 DECEMBER 2026"
+          line2="9:00 PM"
+          hint="Scratch to reveal date"
+        />
         <div className="hero-venue">Welcome Resort · Alwar, Rajasthan</div>
         <Countdown />
         <a className="discover" href="#story"><span>SCROLL TO DISCOVER</span><ChevronDown /></a>
@@ -449,23 +423,10 @@ function App() {
         <div className="story-frame portrait-frame"><div className="portrait-backdrop"/><img className="portrait-art" src={images.hero} alt="Rajendra and Monika illustrated portrait"/><div className="frame-caption">Two Families · Two Hearts · One Journey</div></div>
       </RevealSection>
 
-      <RevealSection className="dark center save-date-premium">
-        <GoldDust />
-        <small>02 · SAVE THE DATE</small>
-        <h2>Until we say <em>“I do.”</em></h2>
-        <p className="save-date-hint">Unveil our wedding day with a royal scratch card</p>
-        <ScratchReveal
-          size="large"
-          className="save-scratch"
-          title="Shubh Vivah"
-          line1="1 December 2026"
-          line2="9:00 PM · Welcome Resort, Alwar"
-        />
-        <Countdown className="countdown-premium" />
-      </RevealSection>
+      <RevealSection className="dark center"><small>02 · SAVE THE DATE</small><h2>Until we say <em>“I do.”</em></h2><div className="bigdate">1 December 2026 · 9:00 PM</div><Countdown /></RevealSection>
 
       <RevealSection className="palace center"><small>03 · ROYAL SETTING</small><h2>A celebration in the heart of <em>Rajasthan.</em></h2>
-        <div className="palace-art premium-palace premium-glow-ring"><div className="palace-backdrop"/><img className="palace-art-img" src={images.palace} alt="Rajasthani palace and wedding mandap illustration"/><div className="palace-glow"/><div className="palace-badge">RAJASTHAN · ROYAL MANDAP</div></div>
+        <div className="palace-art premium-palace"><div className="palace-backdrop"/><img className="palace-art-img" src={images.palace} alt="Rajasthani palace and wedding mandap illustration"/><div className="palace-glow"/><div className="palace-badge">RAJASTHAN · ROYAL MANDAP</div></div>
         <p className="lead center-text">Marigolds, lanterns, palace arches and a royal mandap — the visual language of our celebration.</p>
       </RevealSection>
 
