@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useReducedMotion } from "./useReducedMotion";
+import { SLIP_CLIP } from "./paper";
 
 function DustMotes({ count = 18 }) {
   return (
@@ -13,7 +14,7 @@ function DustMotes({ count = 18 }) {
             top: `${(i * 11) % 100}%`,
             animationDelay: `${-(i * 0.8)}s`,
             animationDuration: `${14 + (i % 6) * 2}s`,
-            opacity: 0.12 + (i % 5) * 0.03,
+            opacity: 0.18 + (i % 5) * 0.05,
           }}
         />
       ))}
@@ -53,13 +54,9 @@ export function EnvelopeLanding({ onOpen }) {
 
   return (
     <div className={`envelope-landing intro-${introDone ? "done" : "pending"} phase-${phaseClass}`}>
-      <div className="envelope-studio" aria-hidden="true">
-        <div className="studio-aged-paper" />
-        <div className="studio-warm-glow" />
-        <div className="studio-paper-stain" />
-        <div className="studio-paper-edge" />
-        <div className="studio-vignette studio-vignette--soft" />
-        <div className="studio-keylight" />
+      <div className="desk-surface" aria-hidden="true">
+        <div className="desk-grain" />
+        <div className="desk-lamp" />
       </div>
 
       <DustMotes count={reducedMotion ? 0 : 16} />
@@ -67,7 +64,6 @@ export function EnvelopeLanding({ onOpen }) {
       <div className="envelope-stage">
         <div className={`envelope-rig${hoverSeal && phase === "SEALED" ? " rig-hover" : ""}`}>
           <div className="envelope-contact-shadow" aria-hidden="true" />
-          <div className="envelope-halo" aria-hidden="true" />
 
           <div className="envelope-3d envelope-closed">
             <div className="env-stack">
@@ -75,45 +71,47 @@ export function EnvelopeLanding({ onOpen }) {
 
               <div className="env-panel env-panel--body">
                 <div className="env-texture" aria-hidden="true" />
-                <div className="env-gold-frame" aria-hidden="true">
-                  <span className="frame-corner tl" />
-                  <span className="frame-corner tr" />
-                  <span className="frame-corner bl" />
-                  <span className="frame-corner br" />
-                </div>
-                <div className="envelope-letter-peek" aria-hidden="true">
-                  <div className="letter-edge">
-                    <div
-                      className={`envelope-reveal-names${phase === "FLAP_OPEN" || phase === "REVEAL" ? " reveal-visible" : ""}`}
-                      aria-live="polite"
-                    >
-                      <span className="reveal-name">Rajendra</span>
-                      <span className="reveal-heart" aria-hidden="true">♥</span>
-                      <span className="reveal-name">Monika</span>
-                    </div>
-                  </div>
-                </div>
-                <div className="envelope-face-text">
-                  <div className="env-names-stack" aria-label="Rajendra Kumar and Monika">
-                    <span className="env-name-line">RAJENDRA</span>
-                    <span className="env-name-line env-name-line--sm">KUMAR</span>
-                    <span className="env-amp" aria-hidden="true">&amp;</span>
-                    <span className="env-name-line">MONIKA</span>
-                  </div>
-                  <p className="env-line env-date">1 DECEMBER 2026</p>
+              </div>
+
+              <div className="envelope-letter" aria-hidden="true">
+                <div
+                  className={`envelope-reveal-names${phase === "FLAP_OPEN" || phase === "REVEAL" ? " reveal-visible" : ""}`}
+                >
+                  <span className="reveal-hindi">॥ शुभ विवाह ॥</span>
+                  <span className="reveal-name">Rajendra</span>
+                  <span className="reveal-heart">&amp;</span>
+                  <span className="reveal-name">Monika</span>
                 </div>
               </div>
 
               <div className="env-panel env-panel--wing env-panel--wing-left" aria-hidden="true" />
               <div className="env-panel env-panel--wing env-panel--wing-right" aria-hidden="true" />
-              <div className="env-panel env-panel--fold-bottom" aria-hidden="true" />
+              <div className="env-panel env-panel--fold-bottom" aria-hidden="true">
+                <div className="env-texture" />
+              </div>
+              <div className="envelope-face-text" aria-hidden="true">
+                <span className="env-hindi">शुभ विवाह</span>
+                <div className="env-names-stack">
+                  <span className="env-name-line">Rajendra Kumar</span>
+                  <span className="env-amp">&amp;</span>
+                  <span className="env-name-line">Monika</span>
+                </div>
+                <p className="env-line env-date">1 December 2026 · Alwar</p>
+              </div>
+              <span className="env-postmark" aria-hidden="true">
+                <span>ALWAR</span>
+                <b>01·XII</b>
+                <span>2026</span>
+              </span>
               <div className="env-panel env-panel--fold-top">
                 <div className="env-texture env-texture--flap" aria-hidden="true" />
-                <div className="flap-foil-edge" aria-hidden="true" />
               </div>
 
-              <div className="env-flap-crease" aria-hidden="true" />
-              <div className="envelope-inner-light" aria-hidden="true" />
+              <div className="env-twine" aria-hidden="true">
+                <span className="env-twine-band" />
+                <span className="env-twine-end env-twine-end--a" />
+                <span className="env-twine-end env-twine-end--b" />
+              </div>
 
               <button
                 type="button"
@@ -122,7 +120,7 @@ export function EnvelopeLanding({ onOpen }) {
                 onMouseEnter={() => setHoverSeal(true)}
                 onMouseLeave={() => setHoverSeal(false)}
                 disabled={busy}
-                aria-label="Open wedding invitation"
+                aria-label="Break the seal and open the wedding invitation"
               >
                 <span className="wax-drip wax-drip--a" aria-hidden="true" />
                 <span className="wax-drip wax-drip--b" aria-hidden="true" />
@@ -140,24 +138,19 @@ export function EnvelopeLanding({ onOpen }) {
         </div>
 
         <div className={`envelope-cta${busy ? " prompt-hidden" : ""}`}>
-          <div className="envelope-caption">
-            <p className="caption-ganesh">SHRI GANESHAYA NAMAH</p>
-            <p className="caption-couple">Rajendra Kumar <span>&amp;</span> Monika</p>
-            <p className="caption-date">1 December 2026</p>
+          <div className="envelope-caption" style={{ clipPath: SLIP_CLIP }}>
+            <p className="caption-hindi" lang="hi">॥ श्री गणेशाय नमः ॥</p>
+            <p className="caption-couple">
+              Rajendra Kumar <span>&amp;</span> Monika
+            </p>
+            <p className="caption-date">request the honour of your presence</p>
           </div>
-          <p className="prompt-special">WITH LOVE, YOU ARE INVITED</p>
-          <button
-            type="button"
-            className="envelope-open-btn"
-            onClick={openInvitation}
-            disabled={busy}
-          >
-            <span className="envelope-open-btn-shine" aria-hidden="true" />
-            Open Invitation
+          <button type="button" className="envelope-open-btn" onClick={openInvitation} disabled={busy}>
+            Open the Invitation
           </button>
           <p className="prompt-action">
             <span className="prompt-pulse" aria-hidden="true" />
-            Or tap the wax seal above
+            or break the wax seal
           </p>
         </div>
       </div>

@@ -1,7 +1,6 @@
-﻿import React, { useEffect, useRef, useState, useCallback } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import { createRoot } from "react-dom/client";
 import {
-  Sparkles,
   Flower2,
   Music,
   Volume2,
@@ -13,6 +12,7 @@ import {
   Utensils,
   Flame,
   PartyPopper,
+  Sparkles,
   Sun,
   Leaf,
   Crown,
@@ -21,6 +21,7 @@ import {
 import "./styles.css";
 import { EnvelopeLanding } from "./EnvelopeLanding";
 import { FitPageContent } from "./FitPageContent";
+import { FIBRES, SHEET_CLIP, UNDER_CLIP_A, UNDER_CLIP_B, TAG_CLIPS } from "./paper";
 
 const RSVP_NAMES = [
   "Mukesh",
@@ -60,34 +61,13 @@ const SHARE_MSG = encodeURIComponent(
 const MAPS_URL =
   "https://www.google.com/maps/search/?api=1&query=Welcome+Resort+200+Ft+Rd+Dayanand+Nagar+Sakti+Nagar+Alwar+Rajasthan+301001";
 
-function GoldParticles({ count = 20 }) {
-  return (
-    <div className="gold-particles" aria-hidden="true">
-      {Array.from({ length: count }).map((_, i) => (
-        <span
-          key={i}
-          className="particle"
-          style={{
-            left: `${(i * 5.3) % 100}%`,
-            animationDelay: `${-(i * 0.47)}s`,
-            animationDuration: `${6 + (i % 5) * 1.4}s`,
-            fontSize: `${8 + (i % 4) * 4}px`,
-          }}
-        >
-          {i % 5 === 0 ? "✦" : i % 4 === 0 ? "❀" : i % 3 === 0 ? "✿" : i % 2 === 0 ? "◆" : "·"}
-        </span>
-      ))}
-    </div>
-  );
-}
+const ROMAN = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII"];
 
-function Divider({ light = false }) {
+function Divider() {
   return (
-    <div className={`patrika-divider${light ? " divider-light" : ""}`} aria-hidden="true">
+    <div className="patrika-divider" aria-hidden="true">
       <span className="div-line" />
-      <span className="div-motif">
-        <Sparkles size={10} strokeWidth={1.5} className="div-icon" />
-      </span>
+      <span className="div-motif">❦</span>
       <span className="div-line" />
     </div>
   );
@@ -103,11 +83,31 @@ function PageHeader({ title, subtitle }) {
   );
 }
 
-function IconOrb({ children, variant = "gold", size = "md" }) {
+function IconOrb({ children, size = "md" }) {
   return (
-    <div className={`icon-orb icon-orb--${variant} icon-orb--${size}`} aria-hidden="true">
+    <div className={`icon-orb icon-orb--${size}`} aria-hidden="true">
       {children}
     </div>
+  );
+}
+
+function InkStamp({ children, tone = "red", tilt = -3, className = "" }) {
+  return (
+    <div className={`ink-stamp ink-stamp--${tone} ${className}`} style={{ "--tilt": `${tilt}deg` }}>
+      {children}
+    </div>
+  );
+}
+
+function CornerOrnament({ pos }) {
+  return (
+    <svg className={`corner-deco ${pos}`} viewBox="0 0 64 64" aria-hidden="true">
+      <path d="M3 61V16C3 8.8 8.8 3 16 3h45" />
+      <path d="M9 61V19c0-5.5 4.5-10 10-10h42" className="thin" />
+      <path d="M19 19c9 0 14 5 14 13-7 0-13-5-14-13Z" className="fill" />
+      <circle cx="19" cy="19" r="2.6" className="fill" />
+      <path d="M40 9c3 3 3 6 0 9M9 40c3 3 6 3 9 0" className="thin" />
+    </svg>
   );
 }
 
@@ -132,9 +132,10 @@ function MusicControl() {
       className={`music-ctrl${playing ? " music-playing" : ""}`}
       onClick={toggle}
       aria-label={playing ? "Pause wedding music" : "Play wedding music"}
+      aria-pressed={playing}
     >
-      <span className="music-icon">{playing ? <Volume2 size={16} /> : <Music size={16} />}</span>
-      <span className="music-label">{playing ? "On" : "Music"}</span>
+      <span className="music-icon">{playing ? <Volume2 size={15} /> : <Music size={15} />}</span>
+      <span className="music-label">{playing ? "Playing" : "Music"}</span>
     </button>
   );
 }
@@ -143,34 +144,35 @@ function PageWelcome() {
   return (
     <div className="page-content page-enter page-welcome">
       <div className="page-ganesh-top">
-        <div className="ganesh-mandala">
-          <div className="mandala-ring outer-ring" />
-          <div className="mandala-ring mid-ring" />
-          <div className="ganesh-circle large">
-            <span className="ganesh-symbol large-symbol">OM</span>
-          </div>
+        <div className="om-seal" aria-hidden="true">
+          <span className="om-ring" />
+          <span className="om-glyph">ॐ</span>
         </div>
-        <p className="ganesh-title">SHRI GANESHAYA NAMAH</p>
-      </div>
-      <div className="surface-card surface-card--arch">
-        <p className="blessing-quote">
-          "With the blessings of the Almighty and our beloved elders, we invite you to celebrate the sacred union of our
-          families."
+        <p className="ganesh-hindi" lang="hi">
+          ॥ श्री गणेशाय नमः ॥
         </p>
+        <p className="ganesh-title">Shri Ganeshaya Namah</p>
       </div>
-      <div className="surface-card surface-card--couple">
-        <div className="invitation-kicker">
-          <Sparkles size={10} />
-          <span>SHUBH VIVAH PATRIKA</span>
-          <Sparkles size={10} />
-        </div>
-        <div className="couple-names-display">
-          <span className="display-name">RAJENDRA KUMAR</span>
-          <Heart className="display-heart" size={22} fill="currentColor" />
-          <span className="display-name">MONIKA</span>
-        </div>
-        <p className="bottom-date-text">1 DECEMBER 2026 · ALWAR, RAJASTHAN</p>
+      <p className="blessing-quote">
+        With the blessings of the Almighty and our beloved elders, we invite you to celebrate the sacred union of our
+        families.
+      </p>
+      <div className="invitation-kicker">
+        <span className="kicker-rule" />
+        <span>Shubh Vivah Patrika</span>
+        <span className="kicker-rule" />
       </div>
+      <div className="couple-names-display">
+        <span className="display-name">Rajendra Kumar</span>
+        <span className="display-amp" aria-hidden="true">
+          &amp;
+        </span>
+        <span className="display-name">Monika</span>
+      </div>
+      <InkStamp tilt={-4}>
+        <span className="stamp-big">1 December 2026</span>
+        <span className="stamp-small">Alwar · Rajasthan</span>
+      </InkStamp>
     </div>
   );
 }
@@ -178,13 +180,13 @@ function PageWelcome() {
 function PageFamily() {
   return (
     <div className="page-content page-enter page-family">
-      <PageHeader title="PARICHAY" subtitle="Family Introduction" />
+      <PageHeader title="Parichay" subtitle="an introduction of the families" />
       <div className="family-layout">
-        <div className="family-block bride-block card-3d">
+        <div className="family-block bride-block">
           <div className="family-crown">
-            <Crown size={12} /> BRIDE
+            <Crown size={12} /> Bride
           </div>
-          <h3 className="family-big-name">MONIKA</h3>
+          <h3 className="family-big-name">Monika</h3>
           <div className="family-details">
             <p className="family-relation">Daughter of</p>
             <p className="family-person">Shrimati Rajbala</p>
@@ -193,7 +195,9 @@ function PageFamily() {
               Shri Naresh Chand <span className="family-note">(Const. RJ Police)</span>
             </p>
           </div>
-          <div className="family-divider-mini">— ✦ —</div>
+          <div className="family-divider-mini" aria-hidden="true">
+            · ❧ ·
+          </div>
           <div className="family-details">
             <p className="family-relation">Granddaughter of</p>
             <p className="family-person deceased">Late Shrimati Manbi Devi</p>
@@ -203,14 +207,14 @@ function PageFamily() {
         </div>
         <div className="family-center-div" aria-hidden="true">
           <span className="center-div-line" />
-          <Heart className="center-heart" size={20} fill="currentColor" />
+          <Heart className="center-heart" size={16} fill="currentColor" />
           <span className="center-div-line" />
         </div>
-        <div className="family-block groom-block card-3d">
+        <div className="family-block groom-block">
           <div className="family-crown">
-            <Crown size={12} /> GROOM
+            <Crown size={12} /> Groom
           </div>
-          <h3 className="family-big-name">RAJENDRA KUMAR</h3>
+          <h3 className="family-big-name">Rajendra Kumar</h3>
           <p className="family-title-tag">(Engineer)</p>
           <div className="family-details">
             <p className="family-relation">Son of</p>
@@ -218,7 +222,9 @@ function PageFamily() {
             <p className="family-amp">&amp;</p>
             <p className="family-person">Shri Bhooriya</p>
           </div>
-          <div className="family-divider-mini">— ✦ —</div>
+          <div className="family-divider-mini" aria-hidden="true">
+            · ❧ ·
+          </div>
           <div className="family-details">
             <p className="family-relation">Grandson of</p>
             <p className="family-person deceased">Late Shrimati Panchhi Devi</p>
@@ -231,17 +237,17 @@ function PageFamily() {
   );
 }
 
-function TimelineDay({ day, month, year, label, tone, children }) {
+function TimelineDay({ day, month, year, label, tone, tilt = -2, children }) {
   return (
     <section className={`timeline-day timeline-day--${tone}`}>
       <div className="timeline-day-head">
-        <div className="event-date-banner compact-banner">
+        <InkStamp tone={tone === "haldi" ? "ochre" : "red"} tilt={tilt} className="date-stamp">
           <span className="event-date-num">{day}</span>
-          <div className="event-date-text">
+          <span className="event-date-text">
             <span>{month}</span>
             <span>{year}</span>
-          </div>
-        </div>
+          </span>
+        </InkStamp>
         <p className="timeline-day-label">{label}</p>
       </div>
       <div className="timeline-events">{children}</div>
@@ -252,11 +258,12 @@ function TimelineDay({ day, month, year, label, tone, children }) {
 function TimelineRow({ icon, name, time, desc }) {
   return (
     <div className="timeline-row">
-      <IconOrb variant="maroon">{icon}</IconOrb>
+      <IconOrb size="sm">{icon}</IconOrb>
       <div className="timeline-row-body">
         <span className="timeline-row-name">{name}</span>
         {desc && <span className="timeline-row-desc">{desc}</span>}
       </div>
+      <span className="timeline-leader" aria-hidden="true" />
       <span className="timeline-row-time">{time}</span>
     </div>
   );
@@ -265,16 +272,16 @@ function TimelineRow({ icon, name, time, desc }) {
 function PageFestivitiesEarly() {
   return (
     <div className="page-content page-enter page-festivities">
-      <PageHeader title="SHUBH UTSAV" subtitle="Celebrations · Bhatpura" />
-      <TimelineDay day="29" month="NOVEMBER" year="2026" label="Wedding Celebrations" tone="maroon">
-        <TimelineRow icon={<Utensils size={18} />} name="LUNCH" time="12:00 PM" />
-        <TimelineRow icon={<Flame size={18} />} name="BHAT" time="5:00 PM" />
-        <TimelineRow icon={<Sparkles size={18} />} name="LAGAN" time="6:00 PM" />
-        <TimelineRow icon={<PartyPopper size={18} />} name="DINNER" time="8:00 PM" />
+      <PageHeader title="Shubh Utsav" subtitle="the celebrations · Bhatpura" />
+      <TimelineDay day="29" month="November" year="2026" label="Wedding celebrations" tone="maroon" tilt={-2}>
+        <TimelineRow icon={<Utensils size={15} />} name="Lunch" time="12:00 PM" />
+        <TimelineRow icon={<Flame size={15} />} name="Bhat" time="5:00 PM" />
+        <TimelineRow icon={<Sparkles size={15} />} name="Lagan" time="6:00 PM" />
+        <TimelineRow icon={<PartyPopper size={15} />} name="Dinner" time="8:00 PM" />
       </TimelineDay>
-      <TimelineDay day="30" month="NOVEMBER" year="2026" label="Haldi & Mehendi" tone="haldi">
-        <TimelineRow icon={<Sun size={18} />} name="HALDI & MEHENDI" time="4:00 PM" />
-        <TimelineRow icon={<Leaf size={18} />} name="CHAK" time="6:00 PM" />
+      <TimelineDay day="30" month="November" year="2026" label="Haldi & Mehendi" tone="haldi" tilt={1.5}>
+        <TimelineRow icon={<Sun size={15} />} name="Haldi & Mehendi" time="4:00 PM" />
+        <TimelineRow icon={<Leaf size={15} />} name="Chak" time="6:00 PM" />
       </TimelineDay>
     </div>
   );
@@ -283,16 +290,16 @@ function PageFestivitiesEarly() {
 function PageFestivitiesProcession() {
   return (
     <div className="page-content page-enter page-festivities">
-      <PageHeader title="BARAT &amp; VENUE" subtitle="Bhatpura · Rajasthan" />
-      <TimelineDay day="01" month="DECEMBER" year="2026" label="Procession · Bhatpura" tone="procession">
-        <TimelineRow icon={<Crown size={18} />} name="GHUDCHADI" time="4:00 PM" desc="Groom's ceremonial ride" />
-        <TimelineRow icon={<Music size={18} />} name="BARAT DEPARTURE" time="5:00 PM" desc="Wedding procession" />
+      <PageHeader title="Barat & Venue" subtitle="Bhatpura · Rajasthan" />
+      <TimelineDay day="01" month="December" year="2026" label="The procession · Bhatpura" tone="procession">
+        <TimelineRow icon={<Crown size={15} />} name="Ghudchadi" time="4:00 PM" desc="the groom's ceremonial ride" />
+        <TimelineRow icon={<Music size={15} />} name="Barat Departure" time="5:00 PM" desc="the wedding procession" />
       </TimelineDay>
-      <div className="venue-block venue-glass">
+      <div className="venue-block ink-frame">
         <p className="venue-label">
-          <MapPin size={12} /> VENUE (PRE-WEDDING)
+          <MapPin size={12} /> Venue (pre-wedding)
         </p>
-        <p className="venue-main">VPO — BHATPURA</p>
+        <p className="venue-main">VPO — Bhatpura</p>
         <p className="venue-sub">Teh — Nagar, Dist — Bharatpur, Rajasthan</p>
       </div>
     </div>
@@ -302,45 +309,45 @@ function PageFestivitiesProcession() {
 function PageVivah() {
   return (
     <div className="page-content page-enter page-vivah">
-      <PageHeader title="SHUBH VIVAH" subtitle="Sacred wedding ceremony" />
-      <div className="mandap-illustration card-3d" aria-hidden="true">
+      <PageHeader title="Shubh Vivah" subtitle="the sacred wedding ceremony" />
+      <div className="mandap-illustration" aria-hidden="true">
         <div className="mandap-arch">
           <div className="mandap-inner">
             <IconOrb size="sm">
-              <Flame size={16} />
+              <Flame size={15} />
             </IconOrb>
-            <span className="mandap-om">OM</span>
+            <span className="mandap-om">ॐ</span>
             <IconOrb size="sm">
-              <Flame size={16} />
+              <Flame size={15} />
             </IconOrb>
           </div>
           <div className="mandap-garland">
-            <Flower2 size={14} />
-            <Flower2 size={14} />
-            <Flower2 size={14} />
+            <Flower2 size={13} />
+            <Flower2 size={13} />
+            <Flower2 size={13} />
+            <Flower2 size={13} />
+            <Flower2 size={13} />
           </div>
         </div>
       </div>
       <div className="grand-couple">
-        <span className="grand-name">RAJENDRA KUMAR</span>
+        <span className="grand-name">Rajendra Kumar</span>
         <span className="grand-and">&amp;</span>
-        <span className="grand-name">MONIKA</span>
+        <span className="grand-name">Monika</span>
       </div>
-      <div className="grand-event-detail">
-        <div className="grand-date-time surface-card surface-card--banner">
-          <p className="grand-date">1 DECEMBER 2026</p>
-          <p className="grand-time">9:00 PM ONWARDS</p>
-        </div>
-      </div>
-      <div className="venue-grand venue-glass">
-        <p className="venue-grand-name">WELCOME RESORT</p>
+      <InkStamp tilt={-2.5} className="grand-date-time">
+        <span className="grand-date">1 December 2026</span>
+        <span className="grand-time">9:00 PM onwards</span>
+      </InkStamp>
+      <div className="venue-grand">
+        <p className="venue-grand-name">Welcome Resort</p>
         <p className="venue-grand-addr">
           200 Ft Rd, Dayanand Nagar, Sakti Nagar,
           <br />
           Alwar, Rajasthan 301001
         </p>
-        <a href={MAPS_URL} target="_blank" rel="noreferrer" className="map-link-btn">
-          <MapPin size={14} /> VIEW ON MAP
+        <a href={MAPS_URL} target="_blank" rel="noreferrer" className="ink-btn ink-btn--solid">
+          <MapPin size={14} /> View on map
         </a>
       </div>
     </div>
@@ -350,24 +357,23 @@ function PageVivah() {
 function PagePresence() {
   return (
     <div className="page-content page-enter page-blessings">
-      <PageHeader title="YOUR PRESENCE" subtitle="will make our celebration complete" />
-      <div className="surface-card bless-quote">
-        <p>"We look forward to celebrating this beautiful occasion with you and your family."</p>
-      </div>
-      <div className="love-label">WITH LOVE AND BLESSINGS</div>
-      <div className="rsvp-section surface-card">
-        <p className="section-kicker">RSVP — FAMILY &amp; FRIENDS</p>
+      <PageHeader title="Your Presence" subtitle="will make our celebration complete" />
+      <p className="bless-quote">
+        We look forward to celebrating this beautiful occasion with you and your family.
+      </p>
+      <div className="love-label">— with love &amp; blessings —</div>
+      <div className="rsvp-section ink-frame">
+        <p className="section-kicker">R.S.V.P. — Family &amp; Friends</p>
         <div className="rsvp-names">
           {RSVP_NAMES.map((name, i) => (
             <span key={i} className="rsvp-name">
               {name}
-              {i < RSVP_NAMES.length - 1 ? "," : ""}
             </span>
           ))}
         </div>
       </div>
-      <div className="compliments-section surface-card">
-        <p className="section-kicker">BEST COMPLIMENTS FROM</p>
+      <div className="compliments-section ink-frame">
+        <p className="section-kicker">Best compliments from</p>
         <div className="compliments-list">
           {BEST_COMPLIMENTS.map((name, i) => (
             <p key={i} className="compliment-name">
@@ -376,32 +382,37 @@ function PagePresence() {
           ))}
         </div>
       </div>
-      <div className="contact-section surface-card">
-        <p className="section-kicker section-kicker--maroon">
-          <Phone size={12} /> CONTACT US
+      <div className="contact-section">
+        <p className="section-kicker">
+          <Phone size={12} /> Contact
         </p>
         <div className="contact-phones">
           {CONTACT_PHONES.map((p) => (
-            <a key={p.number} href={`tel:${p.number}`} className="phone-link">
-              <Phone size={14} /> {p.display}
+            <a key={p.number} href={`tel:${p.number}`} className="ink-btn ink-btn--outline">
+              <Phone size={13} /> {p.display}
             </a>
           ))}
         </div>
       </div>
       <div className="action-buttons">
-        <a href={MAPS_URL} target="_blank" rel="noreferrer" className="action-btn map-btn">
-          <MapPin size={14} /> Venue Map
+        <a href={MAPS_URL} target="_blank" rel="noreferrer" className="ink-btn ink-btn--solid">
+          <MapPin size={14} /> Venue map
         </a>
-        <a href={`https://wa.me/?text=${SHARE_MSG}`} target="_blank" rel="noreferrer" className="action-btn whatsapp-btn">
-          <MessageCircle size={14} /> Share Invite
+        <a
+          href={`https://wa.me/?text=${SHARE_MSG}`}
+          target="_blank"
+          rel="noreferrer"
+          className="ink-btn ink-btn--green"
+        >
+          <MessageCircle size={14} /> Share invite
         </a>
       </div>
       <div className="closing-monogram">
         <span>R</span>
-        <Heart className="closing-heart" size={18} fill="currentColor" />
+        <Heart className="closing-heart" size={16} fill="currentColor" />
         <span>M</span>
       </div>
-      <p className="closing-date">1 · 12 · 2026</p>
+      <p className="closing-date">1 · XII · MMXXVI</p>
     </div>
   );
 }
@@ -415,13 +426,16 @@ const PAGES = [
   { id: "presence", label: "RSVP", short: "RSVP", Component: PagePresence },
 ];
 
+const TURN_MS = 920;
+const SWAP_MS = 440;
+
 function PatrikaBook({ onClose, entering = false }) {
   const [currentPage, setCurrentPage] = useState(0);
   const [turning, setTurning] = useState(false);
   const [turnDir, setTurnDir] = useState("forward");
   const [touchStart, setTouchStart] = useState(null);
   const [bookReady, setBookReady] = useState(!entering);
-  const [chittiUnfold, setChittiUnfold] = useState(entering);
+  const [sheetEntering, setSheetEntering] = useState(entering);
 
   useEffect(() => {
     if (!entering) return;
@@ -431,24 +445,19 @@ function PatrikaBook({ onClose, entering = false }) {
 
   useEffect(() => {
     if (!entering) return;
-    const t = setTimeout(() => setChittiUnfold(false), 1300);
+    const t = setTimeout(() => setSheetEntering(false), 1150);
     return () => clearTimeout(t);
   }, [entering]);
 
   const goTo = useCallback(
     (idx) => {
-      if (turning || chittiUnfold || idx < 0 || idx >= PAGES.length || idx === currentPage) return;
-      const dir = idx > currentPage ? "forward" : "backward";
-      setTurnDir(dir);
+      if (turning || sheetEntering || idx < 0 || idx >= PAGES.length || idx === currentPage) return;
+      setTurnDir(idx > currentPage ? "forward" : "backward");
       setTurning(true);
-      setTimeout(() => {
-        setCurrentPage(idx);
-      }, 460);
-      setTimeout(() => {
-        setTurning(false);
-      }, 920);
+      setTimeout(() => setCurrentPage(idx), SWAP_MS);
+      setTimeout(() => setTurning(false), TURN_MS);
     },
-    [turning, chittiUnfold, currentPage]
+    [turning, sheetEntering, currentPage]
   );
 
   const next = useCallback(() => goTo(currentPage + 1), [goTo, currentPage]);
@@ -464,16 +473,19 @@ function PatrikaBook({ onClose, entering = false }) {
     return () => window.removeEventListener("keydown", onKey);
   }, [next, prev, onClose]);
 
-  const handleTouchStart = (e) => setTouchStart(e.touches[0].clientX);
+  const handleTouchStart = (e) => setTouchStart({ x: e.touches[0].clientX, y: e.touches[0].clientY });
   const handleTouchEnd = (e) => {
     if (touchStart === null) return;
-    const delta = touchStart - e.changedTouches[0].clientX;
-    if (Math.abs(delta) > 50) delta > 0 ? next() : prev();
+    const dx = touchStart.x - e.changedTouches[0].clientX;
+    const dy = touchStart.y - e.changedTouches[0].clientY;
+    // Only horizontal swipes turn the page, so scrolling a long page doesn't.
+    if (Math.abs(dx) > 50 && Math.abs(dx) > Math.abs(dy) * 1.3) dx > 0 ? next() : prev();
     setTouchStart(null);
   };
 
   const { Component } = PAGES[currentPage];
-  const handleSideBack = () => {
+  const busy = turning || sheetEntering;
+  const handleBack = () => {
     if (currentPage === 0) onClose();
     else prev();
   };
@@ -484,98 +496,89 @@ function PatrikaBook({ onClose, entering = false }) {
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
-      <div className="patrika-paper-bg" aria-hidden="true">
-        <div className="patrika-wrinkles" />
-        <div className="patrika-raw-grain" />
+      <div className="desk-surface" aria-hidden="true">
+        <div className="desk-grain" />
+        <div className="desk-lamp" />
       </div>
 
       <header className="patrika-top-bar">
         <span className="patrika-top-brand">R ♥ M</span>
         <span className="patrika-top-page">
-          {currentPage + 1} / {PAGES.length}
+          <b>
+            {ROMAN[currentPage]} / {ROMAN[PAGES.length - 1]}
+          </b>
+          <span className="patrika-top-label">{PAGES[currentPage].label}</span>
         </span>
       </header>
-
-      <button
-        type="button"
-        className="side-nav side-nav--prev"
-        onClick={handleSideBack}
-        disabled={turning || chittiUnfold}
-        aria-label={currentPage === 0 ? "Return to envelope" : "Previous page"}
-      >
-        <ChevronLeft size={24} strokeWidth={1.5} />
-      </button>
-      <button
-        type="button"
-        className="side-nav side-nav--next"
-        onClick={next}
-        disabled={turning || chittiUnfold || currentPage >= PAGES.length - 1}
-        aria-label="Next page"
-      >
-        <ChevronRight size={24} strokeWidth={1.5} />
-      </button>
 
       <div className="book-stage">
         <div className="book-container">
           <div
-            className={`patrika-page${turning ? ` curling-${turnDir}` : ""}${chittiUnfold ? " chitti-opening" : ""}`}
+            className={`patrika-page${turning ? ` turning-${turnDir}` : ""}${sheetEntering ? " sheet-entering" : ""}`}
           >
-            <div className={`page-paper${chittiUnfold ? " page-unfolding" : ""}`}>
+            <div className="paper-under paper-under--b" style={{ clipPath: UNDER_CLIP_B }} aria-hidden="true" />
+            <div className="paper-under paper-under--a" style={{ clipPath: UNDER_CLIP_A }} aria-hidden="true" />
+            <div className="page-paper" style={{ clipPath: SHEET_CLIP }}>
               <div className="page-aged-layers" aria-hidden="true">
-                <div className="page-fiber" />
-                <div className="page-wrinkles" />
+                <div className="page-mottle" />
+                <div className="page-grain" />
+                <div className="page-fibres" />
                 <div className="page-creases" />
                 <div className="page-stain" />
                 <div className="page-edge-wear" />
               </div>
-              <div className="page-curl-roll" aria-hidden="true" />
-              <div className="page-spine" aria-hidden="true" />
-              <div className="page-thickness" aria-hidden="true" />
-              <div className="page-outer-border" />
-              <div className="page-inner-border" />
-              <div className="corner-deco tl" aria-hidden="true">
-                <Flower2 size={18} strokeWidth={1.2} />
-              </div>
-              <div className="corner-deco tr" aria-hidden="true">
-                <Flower2 size={18} strokeWidth={1.2} />
-              </div>
-              <div className="corner-deco bl" aria-hidden="true">
-                <Flower2 size={18} strokeWidth={1.2} />
-              </div>
-              <div className="corner-deco br" aria-hidden="true">
-                <Flower2 size={18} strokeWidth={1.2} />
-              </div>
+              <div className="page-outer-border" aria-hidden="true" />
+              <div className="page-inner-border" aria-hidden="true" />
+              <CornerOrnament pos="tl" />
+              <CornerOrnament pos="tr" />
+              <CornerOrnament pos="bl" />
+              <CornerOrnament pos="br" />
               <FitPageContent pageKey={currentPage}>
                 <Component />
               </FitPageContent>
             </div>
-            <div className="page-turn-shadow" aria-hidden="true" />
           </div>
         </div>
       </div>
+
       <nav className="patrika-bottom-nav" aria-label="Invitation pages">
-        <div className="nav-progress" aria-hidden="true">
-          <div
-            className="nav-progress-fill"
-            style={{ width: `${((currentPage + 1) / PAGES.length) * 100}%` }}
-          />
+        <button
+          type="button"
+          className="turn-btn"
+          onClick={handleBack}
+          disabled={busy}
+          aria-label={currentPage === 0 ? "Back to the envelope" : "Previous page"}
+        >
+          <ChevronLeft size={22} strokeWidth={1.6} />
+        </button>
+        <div className="nav-thread">
+          <div className="nav-tabs">
+            {PAGES.map((p, i) => (
+              <button
+                key={p.id}
+                type="button"
+                className={`nav-tab${i === currentPage ? " nav-tab--active" : ""}${i < currentPage ? " nav-tab--done" : ""}`}
+                style={{ clipPath: TAG_CLIPS[i], "--tag-tilt": `${((i * 7) % 5) - 2}deg` }}
+                onClick={() => goTo(i)}
+                disabled={busy}
+                aria-label={`Page ${i + 1}: ${p.label}`}
+                aria-current={i === currentPage ? "page" : undefined}
+              >
+                <span className="nav-tab-num">{ROMAN[i]}</span>
+                <span className="nav-tab-label">{p.short}</span>
+              </button>
+            ))}
+          </div>
         </div>
-        <div className="nav-tabs">
-          {PAGES.map((p, i) => (
-            <button
-              key={p.id}
-              type="button"
-              className={`nav-tab${i === currentPage ? " nav-tab--active" : ""}${i < currentPage ? " nav-tab--done" : ""}`}
-              onClick={() => goTo(i)}
-              disabled={turning || chittiUnfold}
-              aria-label={p.label}
-              aria-current={i === currentPage ? "page" : undefined}
-            >
-              <span className="nav-tab-num">{i + 1}</span>
-              <span className="nav-tab-label">{p.short}</span>
-            </button>
-          ))}
-        </div>
+        <button
+          type="button"
+          className="turn-btn"
+          onClick={next}
+          disabled={busy || currentPage >= PAGES.length - 1}
+          aria-label="Next page"
+        >
+          <ChevronRight size={22} strokeWidth={1.6} />
+        </button>
       </nav>
     </div>
   );
@@ -598,12 +601,10 @@ function App() {
   return (
     <div
       className={`app-root${phase === "SEALED" ? " app-root--sealed" : ""}${phase === "PATRIKA" ? " app-root--patrika" : ""}`}
+      style={{ "--paper-fibres": FIBRES }}
     >
-      <GoldParticles count={phase === "PATRIKA" ? 14 : 0} />
       {phase === "SEALED" && <EnvelopeLanding onOpen={handleEnvelopeOpen} />}
-      {phase === "PATRIKA" && (
-        <PatrikaBook onClose={handleReturnToEnvelope} entering={patrikaEnter} />
-      )}
+      {phase === "PATRIKA" && <PatrikaBook onClose={handleReturnToEnvelope} entering={patrikaEnter} />}
       <MusicControl />
     </div>
   );
