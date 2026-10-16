@@ -94,8 +94,12 @@ export function EnvelopeLanding({ onOpen }) {
                   </div>
                 </div>
                 <div className="envelope-face-text">
-                  <p className="env-line env-ganesh">SHRI GANESHAYA NAMAH</p>
-                  <p className="env-line env-names">RAJENDRA KUMAR &amp; MONIKA</p>
+                  <div className="env-names-stack" aria-label="Rajendra Kumar and Monika">
+                    <span className="env-name-line">RAJENDRA</span>
+                    <span className="env-name-line env-name-line--sm">KUMAR</span>
+                    <span className="env-amp" aria-hidden="true">&amp;</span>
+                    <span className="env-name-line">MONIKA</span>
+                  </div>
                   <p className="env-line env-date">1 DECEMBER 2026</p>
                 </div>
               </div>
@@ -135,11 +139,25 @@ export function EnvelopeLanding({ onOpen }) {
           </div>
         </div>
 
-        <div className={`envelope-prompt${busy ? " prompt-hidden" : ""}`}>
+        <div className={`envelope-cta${busy ? " prompt-hidden" : ""}`}>
+          <div className="envelope-caption">
+            <p className="caption-ganesh">SHRI GANESHAYA NAMAH</p>
+            <p className="caption-couple">Rajendra Kumar <span>&amp;</span> Monika</p>
+            <p className="caption-date">1 December 2026</p>
+          </div>
           <p className="prompt-special">WITH LOVE, YOU ARE INVITED</p>
+          <button
+            type="button"
+            className="envelope-open-btn"
+            onClick={openInvitation}
+            disabled={busy}
+          >
+            <span className="envelope-open-btn-shine" aria-hidden="true" />
+            Open Invitation
+          </button>
           <p className="prompt-action">
             <span className="prompt-pulse" aria-hidden="true" />
-            Gently tap the wax seal to open
+            Or tap the wax seal above
           </p>
         </div>
       </div>

@@ -5,6 +5,7 @@ export function FitPageContent({ children, pageKey }) {
   const viewportRef = useRef(null);
   const contentRef = useRef(null);
   const [scale, setScale] = useState(1);
+  const [scrollable, setScrollable] = useState(false);
 
   useLayoutEffect(() => {
     const viewport = viewportRef.current;
@@ -23,10 +24,18 @@ export function FitPageContent({ children, pageKey }) {
       const cw = content.scrollWidth;
       if (!ch) return;
 
-      const pad = 8;
+      const pad = 10;
       const fit = Math.min((vh - pad) / ch, (vw - pad) / Math.max(cw, 1), 1);
-      const next = Math.max(0.24, Math.min(1, fit));
-      setScale(Number(next.toFixed(4)));
+      const minScale = 0.58;
+
+      if (fit < minScale) {
+        setScale(1);
+        setScrollable(true);
+        return;
+      }
+
+      setScrollable(false);
+      setScale(Number(Math.min(1, fit).toFixed(4)));
     };
 
     const run = () => requestAnimationFrame(() => requestAnimationFrame(measure));
@@ -49,14 +58,18 @@ export function FitPageContent({ children, pageKey }) {
   }, [children, pageKey]);
 
   return (
-    <div className="page-scroll" ref={viewportRef}>
+    <div className={`page-scroll${scrollable ? " page-scroll--flow" : ""}`} ref={viewportRef}>
       <div
         className="page-fit-scale"
         ref={contentRef}
-        style={{
-          transform: `scale(${scale})`,
-          transformOrigin: "center center",
-        }}
+        style={
+          scrollable
+            ? undefined
+            : {
+                transform: `scale(${scale})`,
+                transformOrigin: "center center",
+              }
+        }
       >
         {children}
       </div>

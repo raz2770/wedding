@@ -93,6 +93,16 @@ function Divider({ light = false }) {
   );
 }
 
+function PageHeader({ title, subtitle }) {
+  return (
+    <header className="page-header">
+      <h2 className="page-title">{title}</h2>
+      {subtitle ? <p className="page-subtitle">{subtitle}</p> : null}
+      <Divider />
+    </header>
+  );
+}
+
 function IconOrb({ children, variant = "gold", size = "md" }) {
   return (
     <div className={`icon-orb icon-orb--${variant} icon-orb--${size}`} aria-hidden="true">
@@ -131,7 +141,7 @@ function MusicControl() {
 
 function PageWelcome() {
   return (
-    <div className="page-content page-enter">
+    <div className="page-content page-enter page-welcome">
       <div className="page-ganesh-top">
         <div className="ganesh-mandala">
           <div className="mandala-ring outer-ring" />
@@ -142,29 +152,25 @@ function PageWelcome() {
         </div>
         <p className="ganesh-title">SHRI GANESHAYA NAMAH</p>
       </div>
-      <Divider />
-      <div className="page-arch">
-        <div className="arch-shape">
-          <div className="blessing-text">
-            <p className="blessing-quote">
-              "With the blessings of the Almighty and our beloved elders, we invite you to celebrate the sacred union
-              of our families."
-            </p>
-          </div>
+      <div className="surface-card surface-card--arch">
+        <p className="blessing-quote">
+          "With the blessings of the Almighty and our beloved elders, we invite you to celebrate the sacred union of our
+          families."
+        </p>
+      </div>
+      <div className="surface-card surface-card--couple">
+        <div className="invitation-kicker">
+          <Sparkles size={10} />
+          <span>SHUBH VIVAH PATRIKA</span>
+          <Sparkles size={10} />
         </div>
+        <div className="couple-names-display">
+          <span className="display-name">RAJENDRA KUMAR</span>
+          <Heart className="display-heart" size={22} fill="currentColor" />
+          <span className="display-name">MONIKA</span>
+        </div>
+        <p className="bottom-date-text">1 DECEMBER 2026 · ALWAR, RAJASTHAN</p>
       </div>
-      <Divider />
-      <div className="invitation-kicker">
-        <Sparkles size={10} />
-        <span>SHUBH VIVAH PATRIKA</span>
-        <Sparkles size={10} />
-      </div>
-      <div className="couple-names-display">
-        <span className="display-name">RAJENDRA KUMAR</span>
-        <Heart className="display-heart" size={22} fill="currentColor" />
-        <span className="display-name">MONIKA</span>
-      </div>
-      <p className="bottom-date-text">1 DECEMBER 2026 · ALWAR, RAJASTHAN</p>
     </div>
   );
 }
@@ -172,9 +178,7 @@ function PageWelcome() {
 function PageFamily() {
   return (
     <div className="page-content page-enter page-family">
-      <h2 className="page-title">PARICHAY</h2>
-      <p className="page-subtitle">Family Introduction</p>
-      <Divider />
+      <PageHeader title="PARICHAY" subtitle="Family Introduction" />
       <div className="family-layout">
         <div className="family-block bride-block card-3d">
           <div className="family-crown">
@@ -261,9 +265,7 @@ function TimelineRow({ icon, name, time, desc }) {
 function PageFestivitiesEarly() {
   return (
     <div className="page-content page-enter page-festivities">
-      <h2 className="page-title">SHUBH UTSAV</h2>
-      <p className="page-subtitle">Celebrations · Bhatpura</p>
-      <Divider />
+      <PageHeader title="SHUBH UTSAV" subtitle="Celebrations · Bhatpura" />
       <TimelineDay day="29" month="NOVEMBER" year="2026" label="Wedding Celebrations" tone="maroon">
         <TimelineRow icon={<Utensils size={18} />} name="LUNCH" time="12:00 PM" />
         <TimelineRow icon={<Flame size={18} />} name="BHAT" time="5:00 PM" />
@@ -281,9 +283,7 @@ function PageFestivitiesEarly() {
 function PageFestivitiesProcession() {
   return (
     <div className="page-content page-enter page-festivities">
-      <h2 className="page-title">BARAT &amp; VENUE</h2>
-      <p className="page-subtitle">Bhatpura · Rajasthan</p>
-      <Divider />
+      <PageHeader title="BARAT &amp; VENUE" subtitle="Bhatpura · Rajasthan" />
       <TimelineDay day="01" month="DECEMBER" year="2026" label="Procession · Bhatpura" tone="procession">
         <TimelineRow icon={<Crown size={18} />} name="GHUDCHADI" time="4:00 PM" desc="Groom's ceremonial ride" />
         <TimelineRow icon={<Music size={18} />} name="BARAT DEPARTURE" time="5:00 PM" desc="Wedding procession" />
@@ -302,9 +302,7 @@ function PageFestivitiesProcession() {
 function PageVivah() {
   return (
     <div className="page-content page-enter page-vivah">
-      <div className="grand-top-ornament" aria-hidden="true">
-        <Sparkles size={10} /> SHUBH VIVAH <Sparkles size={10} />
-      </div>
+      <PageHeader title="SHUBH VIVAH" subtitle="Sacred wedding ceremony" />
       <div className="mandap-illustration card-3d" aria-hidden="true">
         <div className="mandap-arch">
           <div className="mandap-inner">
@@ -328,9 +326,8 @@ function PageVivah() {
         <span className="grand-and">&amp;</span>
         <span className="grand-name">MONIKA</span>
       </div>
-      <Divider />
       <div className="grand-event-detail">
-        <div className="grand-date-time">
+        <div className="grand-date-time surface-card surface-card--banner">
           <p className="grand-date">1 DECEMBER 2026</p>
           <p className="grand-time">9:00 PM ONWARDS</p>
         </div>
@@ -353,16 +350,13 @@ function PageVivah() {
 function PagePresence() {
   return (
     <div className="page-content page-enter page-blessings">
-      <div className="bless-header">
-        <h2 className="page-title bless-title">YOUR PRESENCE</h2>
-        <p className="page-subtitle">will make our celebration complete</p>
-      </div>
-      <div className="bless-quote">
+      <PageHeader title="YOUR PRESENCE" subtitle="will make our celebration complete" />
+      <div className="surface-card bless-quote">
         <p>"We look forward to celebrating this beautiful occasion with you and your family."</p>
       </div>
       <div className="love-label">WITH LOVE AND BLESSINGS</div>
-      <div className="rsvp-section">
-        <p className="rsvp-title">RSVP — FAMILY &amp; FRIENDS</p>
+      <div className="rsvp-section surface-card">
+        <p className="section-kicker">RSVP — FAMILY &amp; FRIENDS</p>
         <div className="rsvp-names">
           {RSVP_NAMES.map((name, i) => (
             <span key={i} className="rsvp-name">
@@ -372,8 +366,8 @@ function PagePresence() {
           ))}
         </div>
       </div>
-      <div className="compliments-section">
-        <p className="compliments-title">BEST COMPLIMENTS FROM</p>
+      <div className="compliments-section surface-card">
+        <p className="section-kicker">BEST COMPLIMENTS FROM</p>
         <div className="compliments-list">
           {BEST_COMPLIMENTS.map((name, i) => (
             <p key={i} className="compliment-name">
@@ -382,8 +376,8 @@ function PagePresence() {
           ))}
         </div>
       </div>
-      <div className="contact-section">
-        <p className="contact-title">
+      <div className="contact-section surface-card">
+        <p className="section-kicker section-kicker--maroon">
           <Phone size={12} /> CONTACT US
         </p>
         <div className="contact-phones">
@@ -495,6 +489,13 @@ function PatrikaBook({ onClose, entering = false }) {
         <div className="patrika-raw-grain" />
       </div>
 
+      <header className="patrika-top-bar">
+        <span className="patrika-top-brand">R ♥ M</span>
+        <span className="patrika-top-page">
+          {currentPage + 1} / {PAGES.length}
+        </span>
+      </header>
+
       <button
         type="button"
         className="side-nav side-nav--prev"
@@ -552,11 +553,30 @@ function PatrikaBook({ onClose, entering = false }) {
           </div>
         </div>
       </div>
-      <div className="patrika-page-dots" aria-hidden="true">
-        {PAGES.map((_, i) => (
-          <span key={i} className={`patrika-dot${i === currentPage ? " patrika-dot--on" : ""}`} />
-        ))}
-      </div>
+      <nav className="patrika-bottom-nav" aria-label="Invitation pages">
+        <div className="nav-progress" aria-hidden="true">
+          <div
+            className="nav-progress-fill"
+            style={{ width: `${((currentPage + 1) / PAGES.length) * 100}%` }}
+          />
+        </div>
+        <div className="nav-tabs">
+          {PAGES.map((p, i) => (
+            <button
+              key={p.id}
+              type="button"
+              className={`nav-tab${i === currentPage ? " nav-tab--active" : ""}${i < currentPage ? " nav-tab--done" : ""}`}
+              onClick={() => goTo(i)}
+              disabled={turning || chittiUnfold}
+              aria-label={p.label}
+              aria-current={i === currentPage ? "page" : undefined}
+            >
+              <span className="nav-tab-num">{i + 1}</span>
+              <span className="nav-tab-label">{p.short}</span>
+            </button>
+          ))}
+        </div>
+      </nav>
     </div>
   );
 }
@@ -579,10 +599,12 @@ function App() {
     <div
       className={`app-root${phase === "SEALED" ? " app-root--sealed" : ""}${phase === "PATRIKA" ? " app-root--patrika" : ""}`}
     >
+      <GoldParticles count={phase === "PATRIKA" ? 14 : 0} />
       {phase === "SEALED" && <EnvelopeLanding onOpen={handleEnvelopeOpen} />}
       {phase === "PATRIKA" && (
         <PatrikaBook onClose={handleReturnToEnvelope} entering={patrikaEnter} />
       )}
+      <MusicControl />
     </div>
   );
 }
