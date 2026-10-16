@@ -1,26 +1,24 @@
 import React, { useEffect, useRef, useState, useCallback } from "react";
 import { createRoot } from "react-dom/client";
-import {
-  Flower2,
-  Music,
-  Volume2,
-  ChevronLeft,
-  ChevronRight,
-  MapPin,
-  Phone,
-  MessageCircle,
-  Utensils,
-  Flame,
-  PartyPopper,
-  Sparkles,
-  Sun,
-  Leaf,
-  Crown,
-  Heart,
-} from "lucide-react";
+import { Music, Volume2, ChevronLeft, ChevronRight, MapPin, Phone, MessageCircle, Heart } from "lucide-react";
 import "./styles.css";
 import { EnvelopeLanding } from "./EnvelopeLanding";
 import { FitPageContent } from "./FitPageContent";
+import {
+  ThaliIcon,
+  GiftTrayIcon,
+  ScrollIcon,
+  HandiIcon,
+  MehendiHandIcon,
+  KalashIcon,
+  HorseIcon,
+  DholIcon,
+  DiyaIcon,
+  LotusIcon,
+  SafaIcon,
+  MaangTikkaIcon,
+  MarigoldIcon,
+} from "./icons";
 import { FIBRES, SHEET_CLIP, UNDER_CLIP_A, UNDER_CLIP_B, TAG_CLIPS } from "./paper";
 
 const RSVP_NAMES = [
@@ -67,7 +65,9 @@ function Divider() {
   return (
     <div className="patrika-divider" aria-hidden="true">
       <span className="div-line" />
-      <span className="div-motif">❦</span>
+      <span className="div-motif">
+        <LotusIcon size={20} />
+      </span>
       <span className="div-line" />
     </div>
   );
@@ -184,7 +184,7 @@ function PageFamily() {
       <div className="family-layout">
         <div className="family-block bride-block">
           <div className="family-crown">
-            <Crown size={12} /> Bride
+            <MaangTikkaIcon size={16} /> Bride
           </div>
           <h3 className="family-big-name">Monika</h3>
           <div className="family-details">
@@ -196,7 +196,7 @@ function PageFamily() {
             </p>
           </div>
           <div className="family-divider-mini" aria-hidden="true">
-            · ❧ ·
+            <LotusIcon size={16} />
           </div>
           <div className="family-details">
             <p className="family-relation">Granddaughter of</p>
@@ -212,7 +212,7 @@ function PageFamily() {
         </div>
         <div className="family-block groom-block">
           <div className="family-crown">
-            <Crown size={12} /> Groom
+            <SafaIcon size={16} /> Groom
           </div>
           <h3 className="family-big-name">Rajendra Kumar</h3>
           <p className="family-title-tag">(Engineer)</p>
@@ -223,7 +223,7 @@ function PageFamily() {
             <p className="family-person">Shri Bhooriya</p>
           </div>
           <div className="family-divider-mini" aria-hidden="true">
-            · ❧ ·
+            <LotusIcon size={16} />
           </div>
           <div className="family-details">
             <p className="family-relation">Grandson of</p>
@@ -274,14 +274,14 @@ function PageFestivitiesEarly() {
     <div className="page-content page-enter page-festivities">
       <PageHeader title="Shubh Utsav" subtitle="the celebrations · Bhatpura" />
       <TimelineDay day="29" month="November" year="2026" label="Wedding celebrations" tone="maroon" tilt={-2}>
-        <TimelineRow icon={<Utensils size={15} />} name="Lunch" time="12:00 PM" />
-        <TimelineRow icon={<Flame size={15} />} name="Bhat" time="5:00 PM" />
-        <TimelineRow icon={<Sparkles size={15} />} name="Lagan" time="6:00 PM" />
-        <TimelineRow icon={<PartyPopper size={15} />} name="Dinner" time="8:00 PM" />
+        <TimelineRow icon={<ThaliIcon />} name="Lunch" time="12:00 PM" />
+        <TimelineRow icon={<GiftTrayIcon />} name="Bhat" time="5:00 PM" />
+        <TimelineRow icon={<ScrollIcon />} name="Lagan" time="6:00 PM" />
+        <TimelineRow icon={<HandiIcon />} name="Dinner" time="8:00 PM" />
       </TimelineDay>
       <TimelineDay day="30" month="November" year="2026" label="Haldi & Mehendi" tone="haldi" tilt={1.5}>
-        <TimelineRow icon={<Sun size={15} />} name="Haldi & Mehendi" time="4:00 PM" />
-        <TimelineRow icon={<Leaf size={15} />} name="Chak" time="6:00 PM" />
+        <TimelineRow icon={<MehendiHandIcon />} name="Haldi & Mehendi" time="4:00 PM" />
+        <TimelineRow icon={<KalashIcon />} name="Chak" time="6:00 PM" />
       </TimelineDay>
     </div>
   );
@@ -292,8 +292,8 @@ function PageFestivitiesProcession() {
     <div className="page-content page-enter page-festivities">
       <PageHeader title="Barat & Venue" subtitle="Bhatpura · Rajasthan" />
       <TimelineDay day="01" month="December" year="2026" label="The procession · Bhatpura" tone="procession">
-        <TimelineRow icon={<Crown size={15} />} name="Ghudchadi" time="4:00 PM" desc="the groom's ceremonial ride" />
-        <TimelineRow icon={<Music size={15} />} name="Barat Departure" time="5:00 PM" desc="the wedding procession" />
+        <TimelineRow icon={<HorseIcon />} name="Ghudchadi" time="4:00 PM" desc="the groom's ceremonial ride" />
+        <TimelineRow icon={<DholIcon />} name="Barat Departure" time="5:00 PM" desc="the wedding procession" />
       </TimelineDay>
       <div className="venue-block ink-frame">
         <p className="venue-label">
@@ -314,19 +314,19 @@ function PageVivah() {
         <div className="mandap-arch">
           <div className="mandap-inner">
             <IconOrb size="sm">
-              <Flame size={15} />
+              <DiyaIcon />
             </IconOrb>
             <span className="mandap-om">ॐ</span>
             <IconOrb size="sm">
-              <Flame size={15} />
+              <DiyaIcon />
             </IconOrb>
           </div>
           <div className="mandap-garland">
-            <Flower2 size={13} />
-            <Flower2 size={13} />
-            <Flower2 size={13} />
-            <Flower2 size={13} />
-            <Flower2 size={13} />
+            <MarigoldIcon size={15} />
+            <MarigoldIcon size={15} />
+            <MarigoldIcon size={15} />
+            <MarigoldIcon size={15} />
+            <MarigoldIcon size={15} />
           </div>
         </div>
       </div>
